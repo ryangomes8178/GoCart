@@ -1,14 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import BarcodeView from './app/screens/BarcodeView';
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Hey bastards!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  return <BarcodeView />;
 }
 
 const styles = StyleSheet.create({

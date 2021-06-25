@@ -22,7 +22,7 @@ export default function App() {
       <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
-          placeholder="Email."
+          placeholder="Email"
           placeholderTextColor="#003f5c"
           onChangeText={(email) => setEmail(email)}
         />
@@ -31,7 +31,7 @@ export default function App() {
       <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
-          placeholder="Password."
+          placeholder="Password"
           placeholderTextColor="#003f5c"
           secureTextEntry={true}
           onChangeText={(password) => setPassword(password)}
@@ -42,7 +42,7 @@ export default function App() {
         <Text style={styles.forgot_button}>Forgot Password?</Text>
       </TouchableOpacity>
  
-      <Button >
+      <Button title="Login">
       <TouchableOpacity style={styles.loginBtn}>
         <Text style={styles.loginText}>LOGIN</Text>
         
@@ -72,15 +72,13 @@ const styles = StyleSheet.create({
     width: "70%",
     height: 45,
     marginBottom: 20,
- 
     alignItems: "center",
   },
  
   TextInput: {
     height: 50,
     flex: 1,
-    padding: 10,
-    marginLeft: 20,
+    alignItems: "center",
   },
  
   forgot_button: {

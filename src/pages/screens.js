@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Text,
   View,
+  FlatList,
   Image,
   TextInput,
   Button,
@@ -11,6 +12,9 @@ import {
 } from "react-native";
 import BarcodeView from './BarcodeView';
 import SignInPage from './SignInPage';
+import { NavigationContainer } from '@react-navigation/native';
+import {createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
  
 
 
@@ -18,45 +22,35 @@ const ScreenContainer = ({ children }) => (
     <View style = {styles.container}>{children}</View>
 )
 
+
+
 const email = 0;
 const row = 0;
 export const SignIn = ({ navigation }) => {
   return (
-    <ScreenContainer>
-      
-      <ListView
+    <BarcodeView>
         
-        
-        renderRow={(email, row) => (
-          <View style={{ borderBottomWidth: 0.2 }}>
-            <View >
-              <Text style={{ flex: 0.1 }}>{email}x</Text>
-              <Text style={{ padding: 10, flex: 0.5 }}>
-                {email.toString()}
-              </Text>
-              <Text style={{ flex: 0.2 }}>
-                £{(email * row).toFixed(2)}
-              </Text>
-              <TouchableOpacity
-                style={{ flex: 0.2 }}
-                
-              >
-                <Icon size={15} reverse color="red" name="close" />
-              </TouchableOpacity>
-            </View>
-            
-          </View>
-        )}
-      />
-        
-    </ScreenContainer>
+    </BarcodeView>
   );
 };
-export const SignIn2 = ({ navigation }) => {
-    return (
-        <BarcodeView/>
 
+export const Cart = ({ navigation }) => {
+    return (
+      <Text> Cart </Text>
     );
+  };
+export const SignIn2 = ({ navigation }) => {
+  return (
+    <NavigationContainer>
+    <Tabs.Navigator>
+              
+                <Tabs.Screen name="Camera" component={SignIn} />
+                <Tabs.Screen name="Cart" component={Cart} />
+            </Tabs.Navigator>
+            </NavigationContainer>
+  );
+    
+
 }
 
 const styles2 = StyleSheet.create({
@@ -104,7 +98,7 @@ export const SignInPage1 = ({ navigation }) => {
         <Text style={styles.forgot_button}>Forgot Password?</Text>
       </TouchableOpacity>
  
-      <Button title="Login" onPress={() => navigation.push("Camera")}/>
+      <Button title="Login" onPress={() => navigation.navigate("Camera")}/>
       
       
     </View>

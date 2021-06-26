@@ -8,21 +8,45 @@ import SignInPage from './pages/SignInPage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import {createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import {SignInPage1, SignIn2, SignIn } from "./pages/screens";
+import {SignInPage1, SignIn, SignIn1, Cart } from "./pages/screens";
 
 
 const AuthStack = createStackNavigator();
+const AuthStack2 = createStackNavigator();
 const Tabs = createBottomTabNavigator();
+
+
 export default () => (
   <NavigationContainer>
-    <Tabs.Navigator>
-      <Tabs.Screen name="SignIn" component={SignInPage1} />
-      <Tabs.Screen name="Camera" component={SignIn2} />
-      <Tabs.Screen name="Cart" component={SignIn} />
-    </Tabs.Navigator>
+    <AuthStack.Navigator>
+      <AuthStack.Screen name="SignIn" component={SignInPage1} />
+      <AuthStack.Screen name="Camera" component={SignIn2} />
+
+    </AuthStack.Navigator>
+
+
+
     
-  </NavigationContainer>
+    </NavigationContainer>
+
+
+    
+    
 );
+
+export const SignIn2 = ({ navigation }) => {
+  return (
+    
+    <Tabs.Navigator>
+              
+                <Tabs.Screen name="Camera" component={SignIn} />
+                <Tabs.Screen name="Cart" component={Cart} />
+            </Tabs.Navigator>
+            
+  );
+    
+
+}
 
 const styles = StyleSheet.create({
   container: {

@@ -15,11 +15,6 @@ const AuthStack = createStackNavigator();
 const Tabs = createBottomTabNavigator();
 export default () => (
   <NavigationContainer>
-    <AuthStack.Navigator>
-      <AuthStack.Screen name="SignIn" component={SignInPage1} />
-      <AuthStack.Screen name="Camera" component={SignIn2} />
-      <AuthStack.Screen name="Cart" component={SignIn} />
-    </AuthStack.Navigator>
     <Tabs.Navigator>
       <Tabs.Screen name="SignIn" component={SignInPage1} />
       <Tabs.Screen name="Camera" component={SignIn2} />

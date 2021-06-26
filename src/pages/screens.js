@@ -18,12 +18,36 @@ const ScreenContainer = ({ children }) => (
     <View style = {styles.container}>{children}</View>
 )
 
+const email = 0;
+const row = 0;
 export const SignIn = ({ navigation }) => {
   return (
     <ScreenContainer>
       
-        <Text> SIGN IN 1</Text>
-        <Button title="Login" onPress={() => navigation.push("SignIn2")}/>
+      <ListView
+        
+        
+        renderRow={(email, row) => (
+          <View style={{ borderBottomWidth: 0.2 }}>
+            <View >
+              <Text style={{ flex: 0.1 }}>{email}x</Text>
+              <Text style={{ padding: 10, flex: 0.5 }}>
+                {email.toString()}
+              </Text>
+              <Text style={{ flex: 0.2 }}>
+                £{(email * row).toFixed(2)}
+              </Text>
+              <TouchableOpacity
+                style={{ flex: 0.2 }}
+                
+              >
+                <Icon size={15} reverse color="red" name="close" />
+              </TouchableOpacity>
+            </View>
+            
+          </View>
+        )}
+      />
         
     </ScreenContainer>
   );

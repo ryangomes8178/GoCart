@@ -16,7 +16,7 @@ export default function App() {
  
   return (
     <View style={styles.container}>
-      <Image style={styles.image} source={require("../assets/log2.png")} />
+      <Image style={styles.image} source={require("../../assets/log2.png")} />
  
       <StatusBar style="auto" />
       <View style={styles.inputView}>
@@ -42,7 +42,8 @@ export default function App() {
         <Text style={styles.forgot_button}>Forgot Password?</Text>
       </TouchableOpacity>
  
-      <Button title="Login">
+      
+      <Button title="Login" onPress={() => navigation.push("SignIn2")}>
       <TouchableOpacity style={styles.loginBtn}>
         <Text style={styles.loginText}>LOGIN</Text>
         

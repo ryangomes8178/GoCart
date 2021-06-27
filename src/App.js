@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import 'react-native-gesture-handler';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -6,61 +5,41 @@ import {BarcodeView} from './pages/BarcodeView';
 import {SignInPage} from './pages/SignInPage';
 import {Cart} from './pages/Cart';
 import {Profile} from './pages/Profile';
-
-
-
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import {createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { isLoggedIn } from './pages/SignInPage';
 
-
-
 const AuthStack = createStackNavigator();
 const Tabs = createBottomTabNavigator();
-
 
 export default function App() {
   return (
   <NavigationContainer>
     <AuthStack.Navigator>
-    {isLoggedIn ? (
+      {isLoggedIn ? (
           <>
-                  <AuthStack.Screen name="SKRT" component={SignIn2} options={{headerShown: false}}/>
-
+            <AuthStack.Screen name="SKRT" component={SignIn2} options={{headerShown: false}}/>
           </>
         ) : (
           <>
-          <AuthStack.Screen name="SignIn" component={SignInPage} options={{headerShown: false}}/>
-          <AuthStack.Screen name="SKRT" component={SignIn2} options={{headerShown: false}}/>
+            <AuthStack.Screen name="SignIn" component={SignInPage} options={{headerShown: false}}/>
+            <AuthStack.Screen name="SKRT" component={SignIn2} options={{headerShown: false}}/>
           </>
         )}
-   
-
-      
-      
-    </AuthStack.Navigator>
+      </AuthStack.Navigator>
     </NavigationContainer>
-
-
-    
-    
-);
-      }
+  );
+}
 
 export const SignIn2 = ({ navigation }) => {
   return (
-    
     <Tabs.Navigator>
-                       
-                       <Tabs.Screen name="Profile" component={Profile} />
-                <Tabs.Screen name="Camera" component={BarcodeView} />
-                <Tabs.Screen name="Cart" component={Cart} />
-            </Tabs.Navigator>
-            
+      <Tabs.Screen name="Profile" component={Profile} />
+      <Tabs.Screen name="Camera" component={BarcodeView} />
+      <Tabs.Screen name="Cart" component={Cart} />
+    </Tabs.Navigator>
   );
-    
-
 }
 
 const styles = StyleSheet.create({

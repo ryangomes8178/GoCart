@@ -14,13 +14,8 @@ import {
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 const ScreenContainer = ({ children }) => (
-    <View style = {styles.container}>{children}</View>
-)
-
-const ScreenContainer2 = ({ children }) => (
     <View style = {styles.container_2}>{children}</View>
-  )
-
+)
 
 export const Profile = ({ navigation }) => {
   
@@ -35,7 +30,6 @@ export const Profile = ({ navigation }) => {
         rowMap[rowKey].closeRow();
     }
   };
-  
   
   const deleteRow = (rowMap, rowKey) => {
       closeRow(rowMap, rowKey);
@@ -84,9 +78,9 @@ export const Profile = ({ navigation }) => {
           </TouchableOpacity>
       </View>
   );
+
     return (
-      <ScreenContainer2>
-  
+      <ScreenContainer>
             <View style="styles.container">
               <SwipeListView
                   data={listData}
@@ -100,8 +94,7 @@ export const Profile = ({ navigation }) => {
                   onRowDidOpen={onRowDidOpen}
               />
               </View>
-          
-      </ScreenContainer2>
+      </ScreenContainer>
     );
   };
 
@@ -131,7 +124,6 @@ export const Profile = ({ navigation }) => {
         borderRadius: 5
     },
     
-   
     inputView: {
       backgroundColor: "#FFC0CB",
       borderRadius: 30,
@@ -163,37 +155,37 @@ export const Profile = ({ navigation }) => {
     },
     backTextWhite: {
       color: '#FFF',
-  },
-  rowFront: {
-      alignItems: 'center',
-      backgroundColor: '#CCC',
-      borderBottomColor: 'black',
-      borderBottomWidth: 1,
-      justifyContent: 'center',
-      height: 50,
-  },
-  rowBack: {
-      alignItems: 'center',
-      backgroundColor: '#DDD',
-      flex: 1,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      paddingLeft: 15,
-  },
-  backRightBtn: {
-      alignItems: 'center',
-      bottom: 0,
-      justifyContent: 'center',
-      position: 'absolute',
-      top: 0,
-      width: 75,
-  },
-  backRightBtnLeft: {
-      backgroundColor: 'blue',
-      right: 75,
-  },
-  backRightBtnRight: {
-      backgroundColor: 'red',
-      right: 0,
-  }
+    },
+    rowFront: {
+        alignItems: 'center',
+        backgroundColor: '#CCC',
+        borderBottomColor: 'black',
+        borderBottomWidth: 1,
+        justifyContent: 'center',
+        height: 50,
+    },
+    rowBack: {
+        alignItems: 'center',
+        backgroundColor: '#DDD',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingLeft: 15,
+    },
+    backRightBtn: {
+        alignItems: 'center',
+        bottom: 0,
+        justifyContent: 'center',
+        position: 'absolute',
+        top: 0,
+        width: 75,
+    },
+    backRightBtnLeft: {
+        backgroundColor: 'blue',
+        right: 75,
+    },
+    backRightBtnRight: {
+        backgroundColor: 'red',
+        right: 0,
+    }
   });

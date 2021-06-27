@@ -9,20 +9,25 @@ import {
   TextInput,
   Button,
   TouchableOpacity,
-  TouchableHighlight,
+  TouchableHighlight
 } from "react-native";
 import { SwipeListView } from 'react-native-swipe-list-view';
+import NumericInput from 'react-native-numeric-input'
+import visa from '../../assets/mastercard.png'; 
+
 
 const ScreenContainer = ({ children }) => (
     <View style = {styles.container_2}>{children}</View>
 )
 
+
 export const Cart = ({ navigation }) => {
+
+    var cart_list = ["Strawberries", "Gilette Razor", "Lemon", "Pesto Sauce", "Tomato", "Tortillas - 30 ct", "Filler item", "Filler item", "Filler item", "Filler item"]
   
     const [listData, setListData] = useState(
-      Array(20)
-          .fill('')
-          .map((_, i) => ({ key: `${i}`, text: `item #${i}` }))
+      
+          cart_list.map((_, i) => ({ key: `${i}`, text: cart_list[i] }))
       );
 
     const closeRow = (rowMap, rowKey) => {
@@ -51,15 +56,39 @@ export const Cart = ({ navigation }) => {
   };
 
   const renderItem = data => (
-      <TouchableHighlight
-          onPress={() => console.log('You touched me')}
-          style={styles.rowFront}
-          underlayColor={'#AAA'}
-      >
-          <View>
-              <Text>I am {data.item.text} in a SwipeListView</Text>
+        <TouchableHighlight
+            onPress={() => console.log('You touched me')}
+            style={styles.rowFront}
+            underlayColor={'#AAA'}
+        >
+          <View style={{flexDirection: "row", paddingLeft: 10}}>
+              <View style={{
+                flex: 1,
+                justifyContent: "center"
+              }}>
+                <Text style={{fontSize: 20}}>
+                  {data.item.text}
+                </Text>
+              </View>
+
+              <View style={{flex: 0.9}}>
+                <NumericInput 
+                  
+                  type='up-down'
+                  onChange={value => console.log(value)}
+                  minValue={1}
+                />
+              </View>
+
+
+              <View style={{
+                flex: 0.5,
+                justifyContent: "center"
+              }}>
+                  <Text style={{fontWeight: "bold", fontSize: 25}}>$7.99</Text>
+              </View>
           </View>
-      </TouchableHighlight>
+        </TouchableHighlight>
   );
 
   const renderHiddenItem = (data, rowMap) => (
@@ -79,21 +108,60 @@ export const Cart = ({ navigation }) => {
           </TouchableOpacity>
       </View>
   );
+
+    var getDoubleHeight = function(){
+      return 2 * StatusBar.currentHeight;
+    };
+
     return (
       <ScreenContainer>
-            <View style="styles.container">
-              <SwipeListView
-                  data={listData}
-                  renderItem={renderItem}
-                  renderHiddenItem={renderHiddenItem}
-                  leftOpenValue={75}
-                  rightOpenValue={-150}
-                  previewRowKey={'0'}
-                  previewOpenValue={-40}
-                  previewOpenDelay={3000}
-                  onRowDidOpen={onRowDidOpen}
-              />
-              </View>
+          <View style={
+            {
+              flex: 10,
+              paddingTop: 40
+            }
+          }>
+            <SwipeListView
+                data={listData}
+                renderItem={renderItem}
+                renderHiddenItem={renderHiddenItem}
+                leftOpenValue={75}
+                rightOpenValue={-150}
+                previewRowKey={'0'}
+                previewOpenValue={-40}
+                previewOpenDelay={3000}
+                onRowDidOpen={onRowDidOpen}
+            />
+          </View>
+
+          <View style={{flex: 1, justifyContent: 'flex-end', flexDirection:"row"}}>
+
+              <TouchableOpacity
+                style={{
+                  flex: 0.25,
+                  height: "100%",
+                  backgroundColor: '#338BA8',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                onPress={() => {console.log("edit card")}}>
+                  <Image source={visa} style={{ width: "40%", height: "40%"}} /> 
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{
+                  flex: 0.75,
+                  height: "100%",
+                  backgroundColor: '#1cb51c',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onPress={() => {console.log("check out!")}}>
+                <Text style={{color: 'white', fontSize: 16}}>Checkout - <Text style={{fontWeight:"bold"}}>$39.51</Text></Text>
+              </TouchableOpacity>
+
+          </View>
+
       </ScreenContainer>
     );
   };
@@ -111,58 +179,17 @@ export const Cart = ({ navigation }) => {
       backgroundColor: "#fff"
     },
    
-    image: {
-      marginBottom: 30,
-      width: "75%",
-      height: "30%",
-    },
-  
-    button: {
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        marginVertical: 10,
-        borderRadius: 5
-    },
-    
-    inputView: {
-      backgroundColor: "#FFC0CB",
-      borderRadius: 30,
-      width: "70%",
-      height: 45,
-      marginBottom: 20,
-      alignItems: "center",
-    },
-   
-    TextInput: {
-      height: 50,
-      flex: 1,
-      alignItems: "center",
-    },
-   
-    forgot_button: {
-      height: 30,
-      marginBottom: 30,
-    },
-   
-    loginBtn: {
-      width: "80%",
-      borderRadius: 25,
-      height: 50,
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: 40,
-      backgroundColor: "#FF1493",
-    },
     backTextWhite: {
       color: '#FFF',
+      fontSize: 20
     },
     rowFront: {
         alignItems: 'center',
-        backgroundColor: '#CCC',
+        backgroundColor: '#FFF',
         borderBottomColor: 'black',
         borderBottomWidth: 1,
         justifyContent: 'center',
-        height: 50,
+        height: 100,
     },
     rowBack: {
         alignItems: 'center',
@@ -181,7 +208,7 @@ export const Cart = ({ navigation }) => {
         width: 75,
     },
     backRightBtnLeft: {
-        backgroundColor: 'blue',
+        backgroundColor: 'black',
         right: 75,
     },
     backRightBtnRight: {

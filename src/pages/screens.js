@@ -24,8 +24,9 @@ const ScreenContainer = ({ children }) => (
 
 
 
-const email = 0;
-const row = 0;
+
+export var isLoggedIn = false;
+
 export const SignIn = ({ navigation }) => {
   return (
     <BarcodeView>
@@ -98,7 +99,7 @@ export const SignInPage1 = ({ navigation }) => {
         <Text style={styles.forgot_button}>Forgot Password?</Text>
       </TouchableOpacity>
  
-      <Button title="Login" onPress={() => navigation.navigate("Camera")}/>
+      <Button title="Login" onPress={() => {isLoggedin = true;}}/>
       
       
     </View>

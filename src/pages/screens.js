@@ -9,11 +9,13 @@ import {
   TextInput,
   Button,
   TouchableOpacity,
+  TouchableHighlight,
 } from "react-native";
 import BarcodeView from './BarcodeView';
 import SignInPage from './SignInPage';
 import { NavigationContainer } from '@react-navigation/native';
-import {createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { SwipeListView } from 'react-native-swipe-list-view';
+
 
  
 
@@ -22,8 +24,9 @@ const ScreenContainer = ({ children }) => (
     <View style = {styles.container}>{children}</View>
 )
 
-
-
+const ScreenContainer2 = ({ children }) => (
+  <View style = {styles.container_2}>{children}</View>
+)
 
 export var isLoggedIn = false;
 
@@ -36,10 +39,88 @@ export const SignIn = ({ navigation }) => {
 };
 
 export const Cart = ({ navigation }) => {
+  
+    const [listData, setListData] = useState(
+      Array(20)
+          .fill('')
+          .map((_, i) => ({ key: `${i}`, text: `item #${i}` }))
+      );
+
+    const closeRow = (rowMap, rowKey) => {
+    if (rowMap[rowKey]) {
+        rowMap[rowKey].closeRow();
+    }
+  };
+
+
+  const deleteRow = (rowMap, rowKey) => {
+      closeRow(rowMap, rowKey);
+      const newData = [...listData];
+      const prevIndex = listData.findIndex(item => item.key === rowKey);
+      newData.splice(prevIndex, 1);
+      console.log("newData size: " + newData.length )
+      console.log("oldData size: " + listData.length )
+
+      setListData(newData);
+
+      console.log("newData size: " + newData.length )
+      console.log("oldData size: " + listData.length )
+  };
+
+  const onRowDidOpen = rowKey => {
+      console.log('This row opened', rowKey);
+  };
+
+  const renderItem = data => (
+      <TouchableHighlight
+          onPress={() => console.log('You touched me')}
+          style={styles.rowFront}
+          underlayColor={'#AAA'}
+      >
+          <View>
+              <Text>I am {data.item.text} in a SwipeListView</Text>
+          </View>
+      </TouchableHighlight>
+  );
+
+  const renderHiddenItem = (data, rowMap) => (
+      <View style={styles.rowBack}>
+          <Text>Left</Text>
+          <TouchableOpacity
+              style={[styles.backRightBtn, styles.backRightBtnLeft]}
+              onPress={() => closeRow(rowMap, data.item.key)}
+          >
+              <Text style={styles.backTextWhite}>Close</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+              style={[styles.backRightBtn, styles.backRightBtnRight]}
+              onPress={() => deleteRow(rowMap, data.item.key)}
+          >
+              <Text style={styles.backTextWhite}>Delete</Text>
+          </TouchableOpacity>
+      </View>
+  );
     return (
-      <Text> Cart </Text>
+      <ScreenContainer2>
+
+            <View style="styles.container">
+              <SwipeListView
+                  data={listData}
+                  renderItem={renderItem}
+                  renderHiddenItem={renderHiddenItem}
+                  leftOpenValue={75}
+                  rightOpenValue={-150}
+                  previewRowKey={'0'}
+                  previewOpenValue={-40}
+                  previewOpenDelay={3000}
+                  onRowDidOpen={onRowDidOpen}
+              />
+              </View>
+          
+      </ScreenContainer2>
     );
   };
+
 export const SignIn2 = ({ navigation }) => {
   return (
     <NavigationContainer>
@@ -99,7 +180,7 @@ export const SignInPage1 = ({ navigation }) => {
         <Text style={styles.forgot_button}>Forgot Password?</Text>
       </TouchableOpacity>
  
-      <Button title="Login" onPress={() => {isLoggedin = true;}}/>
+      <Button title="Login" onPress={() => {navigation.navigate("Camera"); isLoggedin = true;}}/>
       
       
     </View>
@@ -114,6 +195,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  container_2: {
+    flex: 1,
+    backgroundColor: "#fff"
   },
  
   image: {
@@ -159,4 +245,39 @@ const styles = StyleSheet.create({
     marginTop: 40,
     backgroundColor: "#FF1493",
   },
+  backTextWhite: {
+    color: '#FFF',
+},
+rowFront: {
+    alignItems: 'center',
+    backgroundColor: '#CCC',
+    borderBottomColor: 'black',
+    borderBottomWidth: 1,
+    justifyContent: 'center',
+    height: 50,
+},
+rowBack: {
+    alignItems: 'center',
+    backgroundColor: '#DDD',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingLeft: 15,
+},
+backRightBtn: {
+    alignItems: 'center',
+    bottom: 0,
+    justifyContent: 'center',
+    position: 'absolute',
+    top: 0,
+    width: 75,
+},
+backRightBtnLeft: {
+    backgroundColor: 'blue',
+    right: 75,
+},
+backRightBtnRight: {
+    backgroundColor: 'red',
+    right: 0,
+}
 });

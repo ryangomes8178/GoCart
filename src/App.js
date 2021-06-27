@@ -49,7 +49,8 @@ export const SignIn2 = ({ navigation }) => {
   return (
     
     <Tabs.Navigator>
-              
+                       
+
                 <Tabs.Screen name="Camera" component={SignIn} />
                 <Tabs.Screen name="Cart" component={Cart} />
             </Tabs.Navigator>

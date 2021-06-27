@@ -53,7 +53,7 @@ export const SignIn2 = ({ navigation }) => {
     
     <Tabs.Navigator>
                        
-                       <Tabs.Screen name="Previous Orders" component={Profile} />
+                       <Tabs.Screen name="Profile" component={Profile} />
                 <Tabs.Screen name="Camera" component={BarcodeView} />
                 <Tabs.Screen name="Cart" component={Cart} />
             </Tabs.Navigator>

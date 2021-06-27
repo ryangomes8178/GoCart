@@ -39,7 +39,7 @@ export const Profile = ({ navigation }) => {
           <View style={styles.item}>
             
             <View style={styles.infoContent}>
-              <Button color="#ffffff" title="Payment Methods" onPress={() => {console.log("to-do")}}/>
+              <Button color="#ffffff" title="Payment Methods" onPress={() => {navigation.navigate("Payment")}}/>
             </View>
           </View>
 

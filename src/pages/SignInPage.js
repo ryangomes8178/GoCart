@@ -11,11 +11,13 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+export var isLoggedIn = false;
+
 const ScreenContainer = ({ children }) => (
   <View style = {styles.container}>{children}</View>
 )
 
-export const SignInPageFunc = ({ navigation }) => {
+export const SignInPage = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
  

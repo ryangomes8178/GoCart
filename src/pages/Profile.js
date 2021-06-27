@@ -22,7 +22,7 @@ const ScreenContainer2 = ({ children }) => (
   )
 
 
-export const PreviousOrders = ({ navigation }) => {
+export const Profile = ({ navigation }) => {
   
     const [listData, setListData] = useState(
       Array(20)

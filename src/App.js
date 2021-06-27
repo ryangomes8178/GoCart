@@ -19,12 +19,13 @@ export default function App() {
     <AuthStack.Navigator>
       {isLoggedIn ? (
           <>
-            <AuthStack.Screen name="SKRT" component={SignIn2} options={{headerShown: false}}/>
+            <AuthStack.Screen name="SKRT" component={TabManager} options={{headerShown: false}}/>
           </>
         ) : (
           <>
             <AuthStack.Screen name="SignIn" component={SignInPage} options={{headerShown: false}}/>
-            <AuthStack.Screen name="SKRT" component={SignIn2} options={{headerShown: false}}/>
+            <AuthStack.Screen name="SKRT" component={TabManager} options={{headerShown: false}}/>
+            
           </>
         )}
       </AuthStack.Navigator>
@@ -32,7 +33,7 @@ export default function App() {
   );
 }
 
-export const SignIn2 = ({ navigation }) => {
+export const TabManager = ({ navigation }) => {
   return (
     <Tabs.Navigator>
       <Tabs.Screen name="Profile" component={Profile} />

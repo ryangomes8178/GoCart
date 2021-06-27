@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component} from 'react';
 import {
   StyleSheet,
   Text,
@@ -12,180 +12,110 @@ import {
   TouchableHighlight,
 } from "react-native";
 import { SwipeListView } from 'react-native-swipe-list-view';
-
-const ScreenContainer = ({ children }) => (
-    <View style = {styles.container_2}>{children}</View>
-)
+import { isLoggedIn } from './SignInPage';
 
 export const Profile = ({ navigation }) => {
-  
-    const [listData, setListData] = useState(
-      Array(20)
-          .fill('')
-          .map((_, i) => ({ key: `${i}`, text: `item #${i}` }))
-      );
-  
-    const closeRow = (rowMap, rowKey) => {
-    if (rowMap[rowKey]) {
-        rowMap[rowKey].closeRow();
-    }
-  };
-  
-  const deleteRow = (rowMap, rowKey) => {
-      closeRow(rowMap, rowKey);
-      const newData = [...listData];
-      const prevIndex = listData.findIndex(item => item.key === rowKey);
-      newData.splice(prevIndex, 1);
-      console.log("newData size: " + newData.length )
-      console.log("oldData size: " + listData.length )
-  
-      setListData(newData);
-  
-      console.log("newData size: " + newData.length )
-      console.log("oldData size: " + listData.length )
-  };
-  
-  const onRowDidOpen = rowKey => {
-      console.log('This row opened', rowKey);
-  };
-  
-  const renderItem = data => (
-      <TouchableHighlight
-          onPress={() => console.log('You touched me')}
-          style={styles.rowFront}
-          underlayColor={'#AAA'}
-      >
-          <View>
-              <Text>I am {data.item.text} in a SwipeListView</Text>
+  return (
+    <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.headerContent}>
+              <Image style={styles.avatar}
+                source={{uri: 'https://bootdey.com/img/Content/avatar/avatar6.png'}}/>
+
+              <Text style={styles.name}>Skrt Io </Text>
+              <Text style={styles.userInfo}>skrt.io.bastards@mail.com </Text>
+              <Text style={styles.userInfo}>Berkeley, California </Text>
           </View>
-      </TouchableHighlight>
-  );
-  
-  const renderHiddenItem = (data, rowMap) => (
-      <View style={styles.rowBack}>
-          <Text>Left</Text>
-          <TouchableOpacity
-              style={[styles.backRightBtn, styles.backRightBtnLeft]}
-              onPress={() => closeRow(rowMap, data.item.key)}
-          >
-              <Text style={styles.backTextWhite}>Close</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={[styles.backRightBtn, styles.backRightBtnRight]}
-              onPress={() => deleteRow(rowMap, data.item.key)}
-          >
-              <Text style={styles.backTextWhite}>Delete</Text>
-          </TouchableOpacity>
-      </View>
-  );
+        </View>
 
-    return (
-      <ScreenContainer>
-            <View style="styles.container">
-              <SwipeListView
-                  data={listData}
-                  renderItem={renderItem}
-                  //renderHiddenItem={renderHiddenItem}
-                  leftOpenValue={75}
-                  rightOpenValue={-150}
-                  previewRowKey={'0'}
-                  previewOpenValue={-40}
-                  previewOpenDelay={3000}
-                  onRowDidOpen={onRowDidOpen}
-              />
-              </View>
-      </ScreenContainer>
-    );
-  };
+        <View style={styles.body}>
+          <View style={styles.item}>
+           
+            <View style={styles.infoContent}>
+              <Button color="#ffffff" title="Edit my Personal Info" onPress={() => {console.log("to-do")}}/>
+            </View>
+          </View>
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#fff",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-  
-    container_2: {
-      flex: 1,
-      backgroundColor: "#fff"
-    },
-   
-    image: {
-      marginBottom: 30,
-      width: "75%",
-      height: "30%",
-    },
-  
-    button: {
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        marginVertical: 10,
-        borderRadius: 5
-    },
-    
-    inputView: {
-      backgroundColor: "#FFC0CB",
-      borderRadius: 30,
-      width: "70%",
-      height: 45,
-      marginBottom: 20,
-      alignItems: "center",
-    },
-   
-    TextInput: {
-      height: 50,
-      flex: 1,
-      alignItems: "center",
-    },
-   
-    forgot_button: {
-      height: 30,
-      marginBottom: 30,
-    },
-   
-    loginBtn: {
-      width: "80%",
-      borderRadius: 25,
-      height: 50,
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: 40,
-      backgroundColor: "#FF1493",
-    },
-    backTextWhite: {
-      color: '#FFF',
-    },
-    rowFront: {
-        alignItems: 'center',
-        backgroundColor: '#CCC',
-        borderBottomColor: 'black',
-        borderBottomWidth: 1,
-        justifyContent: 'center',
-        height: 50,
-    },
-    rowBack: {
-        alignItems: 'center',
-        backgroundColor: '#DDD',
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingLeft: 15,
-    },
-    backRightBtn: {
-        alignItems: 'center',
-        bottom: 0,
-        justifyContent: 'center',
-        position: 'absolute',
-        top: 0,
-        width: 75,
-    },
-    backRightBtnLeft: {
-        backgroundColor: 'blue',
-        right: 75,
-    },
-    backRightBtnRight: {
-        backgroundColor: 'red',
-        right: 0,
-    }
-  });
+          <View style={styles.item}>
+            
+            <View style={styles.infoContent}>
+              <Button color="#ffffff" title="Payment Methods" onPress={() => {console.log("to-do")}}/>
+            </View>
+          </View>
+
+          <View style={styles.item}>
+            
+            <View style={styles.infoContent}>
+              <Button color="#ffffff" title="Previous Orders" onPress={() => {console.log("to-do")}}/>
+            </View>
+          </View>
+
+          <View style={styles.item}>
+            
+            <View style={styles.infoContent}>
+              <Button color="#ffffff" title="Sign Out" onPress={() => {navigation.navigate("SignIn")}}/>
+            </View>
+          </View>
+
+        </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  header:{
+    backgroundColor: "#DCDCDC",
+  },
+  headerContent:{
+    padding:30,
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 130,
+    height: 130,
+    borderRadius: 63,
+    borderWidth: 4,
+    borderColor: "white",
+    marginBottom:10,
+  },
+  name:{
+    fontSize:22,
+    color:"#000000",
+    fontWeight:'600',
+  },
+  userInfo:{
+    fontSize:16,
+    color:"#778899",
+    fontWeight:'600',
+  },
+  body:{
+    backgroundColor: "#778899",
+    height:500,
+    alignItems:'center',
+  },
+  item:{
+    flexDirection : 'row',
+  },
+  infoContent:{
+    flex:1,
+    alignItems:'flex-start',
+    paddingLeft:5
+  },
+  iconContent:{
+    flex:1,
+    alignItems:'flex-end',
+    paddingRight:5,
+  },
+  icon:{
+    width:30,
+    height:30,
+    marginTop:20,
+  },
+  info:{
+    fontSize:18,
+    marginTop:20,
+    color: "#FFFFFF",
+  }
+});
+
+                                            

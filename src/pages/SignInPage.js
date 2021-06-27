@@ -56,6 +56,10 @@ export const SignInPage = ({ navigation }) => {
     </ScreenContainer>
   );
 }
+
+export const setLogIn = ({navigation}) => {
+  isLoggedIn = !isLoggedIn;
+}
  
 const styles = StyleSheet.create({
   container: {

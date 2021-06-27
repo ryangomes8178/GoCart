@@ -13,11 +13,18 @@ export default function App() {
         })();
     }, []);
 
+    let priceHashMap = new Map([
+        ['047400672130','$8.29']
+    ]);
+
+    let nameHashMap = new Map([
+        ['047400672130','Gillette Sensor3 Disposable Razor']
+    ]);
+    
     const handleBarCodeScanned = ({ type, data }) => {
         setScanned(true);
-        alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+        alert(`${nameHashMap.get(data.toString())} has been scanned and has a price of ${priceHashMap.get(data.toString())}!`);
     };
-
     if (hasPermission === null) {
         return <Text>Requesting for camera permission</Text>;
     }

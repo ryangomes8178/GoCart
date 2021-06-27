@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
+import { render } from 'react-dom';
 import {
   StyleSheet,
   Text,
@@ -9,12 +10,17 @@ import {
   Button,
   TouchableOpacity,
 } from "react-native";
- 
-export default function App() {
+
+const ScreenContainer = ({ children }) => (
+  <View style = {styles.container}>{children}</View>
+)
+
+export const SignInPageFunc = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
  
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <Image style={styles.image} source={require("../../assets/log2.png")} />
  
@@ -43,13 +49,10 @@ export default function App() {
       </TouchableOpacity>
  
       
-      <Button title="Login" onPress={() => navigation.push("SignIn2")}>
-      <TouchableOpacity style={styles.loginBtn}>
-        <Text style={styles.loginText}>LOGIN</Text>
-        
-      </TouchableOpacity>
-      </Button>
+      <Button title="Login" onPress={() => {navigation.navigate("SKRT"); isLoggedin = true;}}/>
+      
     </View>
+    </ScreenContainer>
   );
 }
  

@@ -4,12 +4,16 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import BarcodeView from './pages/BarcodeView';
 import {SignInPageFunc} from './pages/SignInPage';
+import {Cart} from './pages/Cart';
+import {PreviousOrders} from './pages/PrevOrders';
+
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import {createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import {SignInPage1, SignIn, SignIn1, Cart, PreviousOrders, SignInPage2 } from "./pages/screens";
+import {SignInPage1, SignIn, SignIn1, SignInPage2 } from "./pages/screens";
 import { isLoggedIn } from './pages/screens';
+
 
 
 const AuthStack = createStackNavigator();

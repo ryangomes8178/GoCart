@@ -22,23 +22,21 @@ const ScreenContainer2 = ({ children }) => (
   )
 
 
-
-
-export const Cart = ({ navigation }) => {
+export const PreviousOrders = ({ navigation }) => {
   
     const [listData, setListData] = useState(
       Array(20)
           .fill('')
           .map((_, i) => ({ key: `${i}`, text: `item #${i}` }))
       );
-
+  
     const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
         rowMap[rowKey].closeRow();
     }
   };
-
-
+  
+  
   const deleteRow = (rowMap, rowKey) => {
       closeRow(rowMap, rowKey);
       const newData = [...listData];
@@ -46,17 +44,17 @@ export const Cart = ({ navigation }) => {
       newData.splice(prevIndex, 1);
       console.log("newData size: " + newData.length )
       console.log("oldData size: " + listData.length )
-
+  
       setListData(newData);
-
+  
       console.log("newData size: " + newData.length )
       console.log("oldData size: " + listData.length )
   };
-
+  
   const onRowDidOpen = rowKey => {
       console.log('This row opened', rowKey);
   };
-
+  
   const renderItem = data => (
       <TouchableHighlight
           onPress={() => console.log('You touched me')}
@@ -68,7 +66,7 @@ export const Cart = ({ navigation }) => {
           </View>
       </TouchableHighlight>
   );
-
+  
   const renderHiddenItem = (data, rowMap) => (
       <View style={styles.rowBack}>
           <Text>Left</Text>
@@ -88,12 +86,12 @@ export const Cart = ({ navigation }) => {
   );
     return (
       <ScreenContainer2>
-
+  
             <View style="styles.container">
               <SwipeListView
                   data={listData}
                   renderItem={renderItem}
-                  renderHiddenItem={renderHiddenItem}
+                  //renderHiddenItem={renderHiddenItem}
                   leftOpenValue={75}
                   rightOpenValue={-150}
                   previewRowKey={'0'}
@@ -106,7 +104,6 @@ export const Cart = ({ navigation }) => {
       </ScreenContainer2>
     );
   };
-  
 
   const styles = StyleSheet.create({
     container: {
@@ -200,4 +197,3 @@ export const Cart = ({ navigation }) => {
       right: 0,
   }
   });
-  

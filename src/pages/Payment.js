@@ -26,51 +26,70 @@ const ScreenContainer = ({ children }) => (
 
 export const Payment = ({ navigation }) => {
   
-      const [state, setState] = useState({
+      var [state, setState] = useState({
       activeIndex:0,
       carouselItems: [
-      {
-          title:"Item 1",
-          text: "Text 1",
-      },
-      {
-          title:"Item 2",
-          text: "Text 2",
-      },
-      {
-          title:"Item 3",
-          text: "Text 3",
-      },
-      {
-          title:"Item 4",
-          text: "Text 4",
-      },
-      {
-          title:"Item 5",
-          text: "Text 5",
-      },
+      // {
+      //     title:"Item 1",
+      //     text: "Text 1",
+      //     imgUrl: "https://i.imgur.com/5oUkgLB.png",
+      // },
+      // {
+      //     title:"348592937859236",
+      //     text: "Ronaldo Gomez",
+      //     imgUrl:"https://i.imgur.com/JWqsQan.png",
+          
+      // },
+      // {
+      //     title:"Item 3",
+      //     text: "Text 3",
+      //     imgUrl:"https://i.imgur.com/deGaUxh.png",
+          
+      // },
+      // {
+      //     title:"Item 4",
+      //     text: "Text 4",
+      //     imgUrl:"https://i.imgur.com/mUVxJha.png",
+          
+      // },
+      // {
+      //     title:"Item 5",
+      //     text: "Text 5",
+      //     imgUrl:"",
+          
+      // },
     ]
    })
   
-  
-  
-
   const creditCardRef = React.useRef();
 
   const handleSubmit = React.useCallback(() => {
     if (creditCardRef.current) {
       const { error, data } = creditCardRef.current.submit();
-      //console.log('ERROR: ', error);
-      console.log('CARD DATA: ', data.number);
-      // console.log('CARD NUMBER: ', parseInt(data.number).substr(-4))
-      var userData = {title: data.number, text: data.holder}
-      setState({carouselItems: [...state.carouselItems, userData]})
+      var CCnumber = data.number.slice(data.number.length - 4);
+      var cardType = ""
+      if (data.brand == "visa") {
+        cardType = "https://i.imgur.com/deGaUxh.png"
+      }
+      if (data.brand == "american-express") {
+        cardType = "https://i.imgur.com/JWqsQan.png"
+      }
+      if (data.brand == "mastercard") {
+        cardType = "https://i.imgur.com/5oUkgLB.png"
+      }
+      
+      var userData = {title: CCnumber, text: data.holder, imgUrl: cardType}
+      var prevState = state.carouselItems;
+      prevState.push(userData)
+      console.log(prevState)
+      setState({carouselItems: prevState})
     }
   }, []);
 
   const _renderItem = ({item, index}) => {
     return (
         <View style={styles.chaka}>
+          <Image source={{uri: item.imgUrl}} style = {styles.image} />
             <Text style={{fontSize: 30}}>{ item.title }</Text>
             <Text>{item.text}</Text>
         </View>
@@ -85,7 +104,7 @@ export const Payment = ({ navigation }) => {
               style={styles.container}
               >
               <CreditCard ref={creditCardRef} />
-              <Button title="Submit" onPress={handleSubmit} />
+              <Button title="Add Card" onPress={handleSubmit} />
           </KeyboardAvoidingView>
           <View style={{ flex: 1, flexDirection:'column', justifyContent: 'center'}}>
           <Carousel
@@ -114,6 +133,11 @@ const styles = StyleSheet.create({
     height: ITEM_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'dodgerblue'
+    backgroundColor: 'white'
+  },
+  image: {
+    width: ITEM_WIDTH,
+    height: ITEM_HEIGHT/1.36,
+    resizeMode: 'contain'
   },
 });

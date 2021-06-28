@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import {BarcodeView} from './pages/BarcodeView';
 import {SignInPage} from './pages/SignInPage';
-import {Cart} from './pages/Cart';
+import {Cart, useForceUpdate} from './pages/Cart';
 import {Profile} from './pages/Profile';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -42,7 +42,7 @@ export const TabManager = ({ navigation }) => {
     <Tabs.Navigator>
       <Tabs.Screen name="Profile" component={Profile} />
       <Tabs.Screen name="Camera" component={BarcodeView} />
-      <Tabs.Screen name="Cart" component={Cart} />
+      <Tabs.Screen name="Cart" component={Cart} onPress={useForceUpdate()} />
     </Tabs.Navigator>
   );
 }

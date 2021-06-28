@@ -13,7 +13,8 @@ import {
 } from "react-native";
 import { SwipeListView } from 'react-native-swipe-list-view';
 import NumericInput from 'react-native-numeric-input'
-import visa from '../../assets/mastercard.png'; 
+import visa from '../../assets/mastercard.png';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
 
 const ScreenContainer = ({ children }) => (
@@ -21,26 +22,73 @@ const ScreenContainer = ({ children }) => (
 )
 
 
+  const getData = async (key) => {
+    try {
+      const jsonValue = await AsyncStorage.getItem(key)
+      console.log(jsonValue != null ? JSON.parse(jsonValue) : null)
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch(e) {
+      // error reading value
+      alert('Something went wrong reading your cart, please restart the app.');
+    }
+  }
+
+//create your forceUpdate hook
+export const useForceUpdate = () => {
+    //console.log("forceupdate!")
+    const [value, setValue] = useState(0); // integer state
+    return () => setValue(value => value + 1); // update the state to force render
+}
+
 export const Cart = ({ navigation }) => {
 
-    var cart_list = ["Strawberries", "Gilette Razor", "Lemon", "Pesto Sauce", "Tomato", "Tortillas - 30 ct", "Filler item", "Filler item", "Filler item", "Filler item"]
-  
-    const [listData, setListData] = useState(
-      
-          cart_list.map((_, i) => ({ key: `${i}`, text: cart_list[i] }))
-      );
+    //var cart_list = ["Strawberries", "Gilette Razor", "Lemon", "Pesto Sauce", "Tomato", "Tortillas - 30 ct", "Filler item", "Filler item", "Filler item", "Filler item"]
+    var cart_list = []
 
-    const closeRow = (rowMap, rowKey) => {
+    const [listData, setListData] = useState(  
+      cart_list.map((_, i) => ({ key: `${i}`, text: cart_list[i] }))
+    );
+
+    const fetchAllItems = async () => {
+      try {
+          const keys = await AsyncStorage.getAllKeys()
+          const items = await AsyncStorage.multiGet(keys)
+          var cart_listData = [];
+
+          var element;
+          for (var i = 0; i < items.length; i++) {
+            element = items[i];
+            var itemDetails = JSON.parse(element[1])
+            cart_listData.push({
+              "key": i.toString(),
+              "barcode": element[0],
+              "text": itemDetails.name,
+              "quantity": itemDetails.quantity,
+              "price": itemDetails.price
+            })
+          }
+          setListData(cart_listData);
+      } catch (error) {
+          console.log(error, "problemo")
+      }
+    }
+
+    fetchAllItems();
+
+
+
+  const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
         rowMap[rowKey].closeRow();
     }
   };
 
-
   const deleteRow = (rowMap, rowKey) => {
       closeRow(rowMap, rowKey);
       const newData = [...listData];
       const prevIndex = listData.findIndex(item => item.key === rowKey);
+      console.log(listData[prevIndex])
+      AsyncStorage.removeItem(listData[prevIndex].barcode)
       newData.splice(prevIndex, 1);
       console.log("newData size: " + newData.length )
       console.log("oldData size: " + listData.length )
@@ -76,7 +124,7 @@ export const Cart = ({ navigation }) => {
                   
                   type='up-down'
                   onChange={value => console.log(value)}
-                  minValue={1}
+                  value={data.item.quantity}
                 />
               </View>
 
@@ -85,7 +133,7 @@ export const Cart = ({ navigation }) => {
                 flex: 0.5,
                 justifyContent: "center"
               }}>
-                  <Text style={{fontWeight: "bold", fontSize: 25}}>$7.99</Text>
+                  <Text style={{fontWeight: "bold", fontSize: 25}}>{data.item.price * data.item.quantity}</Text>
               </View>
           </View>
         </TouchableHighlight>
@@ -156,7 +204,7 @@ export const Cart = ({ navigation }) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
-                onPress={() => {console.log("check out!")}}>
+                onPress={useForceUpdate()}>
                 <Text style={{color: 'white', fontSize: 16}}>Checkout - <Text style={{fontWeight:"bold"}}>$39.51</Text></Text>
               </TouchableOpacity>
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const BarcodeView = ({navigation}) => {
     const [hasPermission, setHasPermission] = useState(null);
@@ -20,10 +21,58 @@ export const BarcodeView = ({navigation}) => {
     let nameHashMap = new Map([
         ['047400672130','Gillette Sensor3 Disposable Razor']
     ]);
+
+    let productHashMap = new Map([
+        ['047400672130', {
+            "name": "Gillette Sensor3 Dispozable Razor",
+            "price": "8.29"
+        }],
+        ['819039021098', {
+            "name": "Tile Mate + Slim (2020) 4-pack (2 Mates, 2 Slims)",
+            "price": "49.99"
+        }],
+        ['049022517431', {
+            "name": "Nice! Spring Water - 1L",
+            "price": "3.99"
+        }]
+    ])
+
+    const storeData = async (key, value) => {
+      try {
+        value.quantity = 1;
+        const jsonValue = JSON.stringify(value)
+        await AsyncStorage.setItem(key, jsonValue)
+      } catch (e) {
+        // saving error
+        alert('Something went wrong saving your cart, please try again!');
+      }
+    }
+
+
+    const getData = async (key) => {
+      try {
+        const jsonValue = await AsyncStorage.getItem(key)
+        console.log(jsonValue != null ? JSON.parse(jsonValue) : null)
+        return jsonValue != null ? JSON.parse(jsonValue) : null;
+      } catch(e) {
+        // error reading value
+        alert('Something went wrong reading your cart, please restart the app !');
+      }
+    }
+
     
     const handleBarCodeScanned = ({ type, data }) => {
         setScanned(true);
-        alert(`${nameHashMap.get(data.toString())} has been scanned and has a price of ${priceHashMap.get(data.toString())}!`);
+        var barcode = data.toString()
+        global.itemsFetched = false;
+        console.log(global.itemsFetched)
+        if (productHashMap.has(data.toString())) {
+            alert(`${productHashMap.get(barcode).name} has been scanned and has a price of ${productHashMap.get(barcode).price}!`);
+            storeData(barcode, productHashMap.get(barcode))
+            getData(barcode)
+        } else {
+            alert('The item\'s barcode (' + barcode + ') did not match any products in our system.')
+        }
     };
     if (hasPermission === null) {
         return <Text>Requesting for camera permission</Text>;

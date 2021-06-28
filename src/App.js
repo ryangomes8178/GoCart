@@ -10,7 +10,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import {createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { isLoggedIn } from './pages/SignInPage';
 import {Payment} from "./pages/Payment";
-
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 const AuthStack = createStackNavigator();
 const Tabs = createBottomTabNavigator();
 
@@ -40,9 +40,36 @@ export default function App() {
 export const TabManager = ({ navigation }) => {
   return (
     <Tabs.Navigator>
-      <Tabs.Screen name="Profile" component={Profile} />
-      <Tabs.Screen name="Camera" component={BarcodeView} />
-      <Tabs.Screen name="Cart" component={Cart} onPress={useForceUpdate()} />
+      <Tabs.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          tabBarLabel: 'Profile',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="account" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Scan"
+        component={BarcodeView}
+        options={{
+          tabBarLabel: 'Scan',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="camera" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Cart"
+        component={Cart}
+        options={{
+          tabBarLabel: 'Cart',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="cart" color={color} size={size} />
+          ),
+        }}
+      />
     </Tabs.Navigator>
   );
 }

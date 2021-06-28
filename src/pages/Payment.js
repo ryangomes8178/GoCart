@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import CreditCard from 'react-native-credit-card-form-ui';
 import Carousel from 'react-native-snap-carousel';
+//import { AsyncStorage } from '@react-native-community/async-storage';
 
 const SLIDER_WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.7);
@@ -83,6 +84,7 @@ export const Payment = ({ navigation }) => {
       prevState.push(userData)
       console.log(prevState)
       setState({carouselItems: prevState})
+      //saveData(state.carouselItems)
     }
   }, []);
 
@@ -95,7 +97,25 @@ export const Payment = ({ navigation }) => {
         </View>
     );
   }
-
+  const saveData = async () => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, state.carouselItems)
+      alert('Data successfully saved')
+    } catch (e) {
+      alert('Failed to save the data to the storage')
+    }
+  }
+  const ReadData = async () => {
+    try {
+      const userState = await AsyncStorage.getItem(STORAGE_KEY)
+  
+      if (userState !== null) {
+        setState({carouselItems: userState})
+      }
+    } catch (e) {
+      alert('Failed to fetch the data from storage')
+    }
+  }
     return (
       <ScreenContainer>
           <KeyboardAvoidingView

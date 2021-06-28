@@ -19,11 +19,10 @@ export const Profile = ({ navigation }) => {
     <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerContent}>
-              <Image style={styles.avatar}
-                source={{uri: 'https://bootdey.com/img/Content/avatar/avatar6.png'}}/>
-
-              <Text style={styles.name}>Skrt Io </Text>
-              <Text style={styles.userInfo}>skrt.io.bastards@mail.com </Text>
+              <Image source={{uri: 'https://i.imgur.com/ZPieMHS.png'}}
+                style={{width: 270, height: 180}} />
+              <Text style={styles.name}>Welcome, SKRT!</Text>
+              <Text style={styles.userInfo}>skrt@gmail.com </Text>
               <Text style={styles.userInfo}>Berkeley, California </Text>
           </View>
         </View>
@@ -67,7 +66,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#DCDCDC",
   },
   headerContent:{
-    padding:30,
+    padding:80,
     alignItems: 'center',
   },
   avatar: {
@@ -79,6 +78,7 @@ const styles = StyleSheet.create({
     marginBottom:10,
   },
   name:{
+    padding:0,
     fontSize:22,
     color:"#000000",
     fontWeight:'600',
@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
     fontWeight:'600',
   },
   body:{
+    padding:20,
     backgroundColor: "#778899",
     height:500,
     alignItems:'center',
@@ -98,13 +99,12 @@ const styles = StyleSheet.create({
   },
   infoContent:{
     flex:1,
-    alignItems:'flex-start',
-    paddingLeft:5
+    alignItems:'center',
+    padding:15
   },
   iconContent:{
     flex:1,
-    alignItems:'flex-end',
-    paddingRight:5,
+    alignItems:'flex-end'
   },
   icon:{
     width:30,

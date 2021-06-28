@@ -192,7 +192,7 @@ export const Cart = ({ navigation }) => {
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}
-                onPress={() => {console.log("edit card")}}>
+                onPress={() => {navigation.navigate("Payment")}}>
                   <Image source={visa} style={{ width: "40%", height: "40%"}} /> 
               </TouchableOpacity>
 

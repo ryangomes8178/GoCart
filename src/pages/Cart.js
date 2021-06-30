@@ -15,6 +15,7 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import InputSpinner from "react-native-input-spinner";
 import visa from '../../assets/mastercard.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CryptoES from "crypto-es";
 import { useFocusEffect } from '@react-navigation/native'; 
 
 
@@ -25,16 +26,16 @@ const ScreenContainer = ({ children }) => (
 var quantity_states = [];
 
 
-  const getData = async (key) => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(key)
-      console.log(jsonValue != null ? JSON.parse(jsonValue) : null)
-      return jsonValue != null ? JSON.parse(jsonValue) : null;
-    } catch(e) {
-      // error reading value
-      alert('Something went wrong reading your cart, please restart the app.');
-    }
+const getData = async (key) => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(key)
+    console.log(jsonValue != null ? JSON.parse(jsonValue) : null)
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch(e) {
+    // error reading value
+    alert('Something went wrong reading your cart, please restart the app.');
   }
+}
 
 const fetchAllItems = async () => {
   try {
@@ -98,6 +99,7 @@ export const Cart = ({ navigation }) => {
         console.log("focused")
         async function updateList(){
           const [fetched_data, total] = await fetchAllItems();
+          
           setListData(fetched_data);
           setTotalState(total)
         }
@@ -105,7 +107,67 @@ export const Cart = ({ navigation }) => {
       }, [])
     );
 
+  const handleCheckout = () => {
 
+      var http_method = 'post';                // Lower case.
+      var url_path = '/v1/payments';    // Portion after the base URL.
+      var salt = CryptoES.lib.WordArray.random(12);  // Randomly generated for each request.
+      var timestamp = (Math.floor(new Date().getTime() / 1000) - 10).toString();
+                                              // Current Unix time.
+      var access_key = '8E34CFD95D661EF7946E';     // The access key received from Rapyd.
+      var secret_key = '5001ae0c57b14924dc361c69d2873c93246f9a22e26168ec514dfcaaa35e853bcd9c72c28dbca3c7';     // Never transmit the secret key by itself.
+
+      var body = JSON.stringify({
+        "amount": totalState,
+        "currency": "USD",
+        "payment_method": {
+          "type": "in_amex_card",
+          "fields": {
+            "number": "4111111111111111",
+            "expiration_month": "12",
+            "expiration_year": "23",
+            "name": "John Doe",
+            "cvv": "345"
+          },
+          "metadata": {
+            "merchant_defined": true
+          }
+        },
+        "ewallets": [
+          {
+            "ewallet": "ewallet_8bf64b61b3133ff3076877c05d3d0d68",
+            "percentage": 100
+          }
+        ],
+        "capture": true
+      });
+
+      var to_sign = http_method + url_path + salt + timestamp + access_key + secret_key + body;
+
+      var signature = CryptoES.enc.Hex.stringify(CryptoES.HmacSHA256(to_sign, secret_key));
+
+      signature = CryptoES.enc.Base64.stringify(CryptoES.enc.Utf8.parse(signature));
+      var options = {
+        'method': 'POST',
+        'url': 'https://sandboxapi.rapyd.net/v1/payments',
+        "body": body,
+        'headers': {
+          'Content-Type': 'application/json',
+          'access_key': access_key,
+          'salt': salt,
+          'timestamp': timestamp,
+          'signature': signature,
+        }
+      };
+
+
+    fetch("https://sandboxapi.rapyd.net/v1/payments", options)
+      .then(response => response.text())
+      .then(result => console.log(result))
+      .catch(error => console.log('error', error));
+
+    navigation.navigate("Confirmation")
+  }
 
   const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
@@ -257,7 +319,7 @@ export const Cart = ({ navigation }) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
-                onPress={() => {navigation.navigate("Confirmation")}}>
+                onPress={handleCheckout}>
                 <Text style={{color: 'white', fontSize: 16}}>Checkout - <Text style={{fontWeight:"bold"}}>{"$" + totalState.toFixed(2)}</Text></Text>
               </TouchableOpacity>
 

@@ -38,6 +38,18 @@ const ScreenContainer = ({ children }) => (
       console.log("saving error")
     }
   }
+
+  const storeCard = async (index, value) => {
+    try {
+      const jsonValue = JSON.stringify(value)
+      await AsyncStorage.setItem('@current_card', jsonValue)
+      await AsyncStorage.setItem('@current_card_index', index.toString())
+    } catch (e) {
+      // saving error
+      console.log("saving error")
+    }
+  }
+
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('@card_key')
@@ -47,6 +59,17 @@ const ScreenContainer = ({ children }) => (
       console.log("error reading")
     }
   }
+
+  const getCardIndex = async () => {
+    try {
+      const index = await AsyncStorage.getItem('@current_card_index')
+      return index != null ? index : null; 
+    } catch (e) {
+      console.log("error reading")
+    }
+  }
+
+
   
 
 export const Payment = ({ navigation }) => {
@@ -103,11 +126,25 @@ export const Payment = ({ navigation }) => {
         cardType = "https://i.imgur.com/5oUkgLB.png"
       }
       
-      var userData = {title: CCnumber, text: data.holder, imgUrl: cardType}
+      var userData = {
+        title: CCnumber,
+        text: data.holder,
+        imgUrl: cardType,
+
+        brand: data.brand,
+        fullNumber: data.number,
+        cvv: data.cvv,
+        expiration: data.expiration,
+        holder: data.holder, 
+      }
       var prevState = state.carouselItems;
       prevState.push(userData)
       setState({carouselItems: prevState})
       storeData(state.carouselItems)
+
+      if(state.carouselItems.length == 1) {
+        saveSelectedCard(0)
+      }
       
     }
   }, []);
@@ -122,14 +159,22 @@ export const Payment = ({ navigation }) => {
     );
   }
 
-  
+  const saveSelectedCard = (slideIndex) => {
+    console.log(state.carouselItems[slideIndex])
+    storeCard(slideIndex, state.carouselItems[slideIndex])
+  }
   
   useFocusEffect(
     React.useCallback(() =>  {
       console.log("focused")
       async function updateList(){
         const fetched_carousel_items = await getData();
+        const currIndex = await getCardIndex();
+        console.log("before snap: saved index ", currIndex, "current Index ", this.carousel.currentIndex)
         setState({carouselItems: fetched_carousel_items})
+        setTimeout(() => this.carousel.snapToItem(currIndex, animated=false, fireCallback=false), 250)
+        //this.carousel.snapToItem(currIndex, animated=false, fireCallback=true)
+        console.log("after snap: saved index ", currIndex, "current Index ", this.carousel.currentIndex)
       }
       updateList();
     }, [])
@@ -154,6 +199,7 @@ export const Payment = ({ navigation }) => {
             renderItem={_renderItem}
             sliderWidth={SLIDER_WIDTH}
             itemWidth={ITEM_WIDTH}
+            onSnapToItem={saveSelectedCard}
           />
           </View>
       </ScreenContainer>

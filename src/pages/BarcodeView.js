@@ -34,6 +34,22 @@ export const BarcodeView = ({navigation}) => {
         ['049022517431', {
             "name": "Nice! Spring Water - 1L",
             "price": "3.99"
+        }],
+        ['876063006521', {
+            "name": "Muscle Milk Chocolate Protein Shake",
+            "price": "3.29"
+        }],
+        ['07199840', {
+            "name": "Coors Light - 12 fl oz",
+            "price": "1.00"
+        }],
+        ['096619321063', {
+            "name": "Kirkland Extra Fancy Mixed Nuts - 40 oz",
+            "price": "8.40"
+        }],
+        ['073854008089', {
+            "name": "Bicycle Standard Playing Cards - 2pk",
+            "price": "7.99"
         }]
     ])
 
@@ -67,6 +83,12 @@ export const BarcodeView = ({navigation}) => {
         global.itemsFetched = false;
         console.log(global.itemsFetched)
         if (productHashMap.has(data.toString())) {
+            global.numCartItems += 1;
+            console.log("items in cart: " + numCartItems)
+            global.total += parseFloat(productHashMap.get(barcode).price)
+            global.total = Math.round(total*100)/100
+            global.renderCount = 0;
+            console.log("global total " + global.total)
             alert(`${productHashMap.get(barcode).name} has been scanned and has a price of ${productHashMap.get(barcode).price}!`);
             storeData(barcode, productHashMap.get(barcode))
             getData(barcode)

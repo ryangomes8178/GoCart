@@ -48,6 +48,8 @@ const fetchAllItems = async () => {
       for (var i = 0; i < items.length; i++) {
         element = items[i];
         var itemDetails = JSON.parse(element[1])
+        console.log(itemDetails)
+        quantity_states[i][1](itemDetails.quantity)
         cart_listData.push({
           "key": i.toString(),
           "barcode": element[0],
@@ -60,6 +62,20 @@ const fetchAllItems = async () => {
       return [cart_listData, total];
   } catch (error) {
       console.log(error, "problemo")
+  }
+}
+
+const updateQuantity = async (barcode, name, price, quantity) => {
+  try {
+    const jsonValue = {
+      "name": name,
+      "price": price,
+      "quantity": quantity
+    }
+    await AsyncStorage.setItem(barcode, JSON.stringify(jsonValue))
+  } catch (e) {
+    // saving error
+    alert('Something went wrong saving your cart, please try again!');
   }
 }
 
@@ -148,19 +164,19 @@ export const Cart = ({ navigation }) => {
                   value={quantity_states[data.item.key][0]}
                   onChange={(num) => {
                     quantity_states[data.item.key][1](num);
-
+                    updateQuantity(data.item.barcode, data.item.text, data.item.price, num)
                   }}
                   onIncrease={(increased) => {
                     var newTotal = totalState + parseFloat(data.item.price)
                     newTotal = Math.round(newTotal * 100) / 100
                     setTotalState(newTotal)
-                    console.log("new total " + global.total)
+                    console.log("new total " + newTotal)
                   }}
                   onDecrease={(decreased) => {
                     var newTotal = totalState - parseFloat(data.item.price)
                     newTotal = Math.round(newTotal * 100) / 100
                     setTotalState(newTotal)
-                    console.log("new total " + global.total)
+                    console.log("new total " + newTotal)
                   }}
                 />
               </View>

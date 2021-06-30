@@ -11,6 +11,7 @@ import {createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { isLoggedIn } from './pages/SignInPage';
 import {Payment} from "./pages/Payment";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Confirmation } from './pages/Confirmation';
 const AuthStack = createStackNavigator();
 const Tabs = createBottomTabNavigator();
 
@@ -22,12 +23,14 @@ export default function App() {
           <>
             <AuthStack.Screen name="SKRT" component={TabManager} options={{headerShown: false}}/>
             <AuthStack.Screen name="Payment" component={Payment}/>
+            <AuthStack.Screen name="Confirmation" component={Confirmation}/>
           </>
         ) : (
           <>
             <AuthStack.Screen name="SignIn" component={SignInPage} options={{headerShown: false}}/>
             <AuthStack.Screen name="SKRT" component={TabManager} options={{headerShown: false}}/>
             <AuthStack.Screen name="Payment" component={Payment}/>
+            <AuthStack.Screen name="Confirmation" component={Confirmation}/>
 
 
           </>

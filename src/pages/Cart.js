@@ -257,7 +257,7 @@ export const Cart = ({ navigation }) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
-                onPress={() => {console.log("hi")}}>
+                onPress={() => {navigation.navigate("Confirmation")}}>
                 <Text style={{color: 'white', fontSize: 16}}>Checkout - <Text style={{fontWeight:"bold"}}>{"$" + totalState.toFixed(2)}</Text></Text>
               </TouchableOpacity>
 

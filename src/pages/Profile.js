@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { isLoggedIn } from './SignInPage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const Profile = ({ navigation }) => {
   return (
@@ -52,7 +53,7 @@ export const Profile = ({ navigation }) => {
           <View style={styles.item}>
             
             <View style={styles.infoContent}>
-              <Button color="#ffffff" title="Sign Out" onPress={() => {navigation.navigate("SignIn")}}/>
+              <Button color="#ffffff" title="Sign Out" onPress={() => {navigation.navigate("SignIn"); AsyncStorage.clear();}}/>
             </View>
           </View>
 

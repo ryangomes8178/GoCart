@@ -15,7 +15,9 @@ import {
 } from "react-native";
 import CreditCard from 'react-native-credit-card-form-ui';
 import Carousel from 'react-native-snap-carousel';
-//import { AsyncStorage } from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { get } from 'react-native/Libraries/Utilities/PixelRatio';
+import { useFocusEffect } from '@react-navigation/native';
 
 const SLIDER_WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.7);
@@ -24,6 +26,28 @@ const ITEM_HEIGHT = Math.round(ITEM_WIDTH * 3 / 4);
 const ScreenContainer = ({ children }) => (
     <View style = {styles.container}>{children}</View>
   )
+
+
+
+  const storeData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value)
+      await AsyncStorage.setItem('@card_key', jsonValue)
+    } catch (e) {
+      // saving error
+      console.log("saving error")
+    }
+  }
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@card_key')
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch(e) {
+      // error reading value
+      console.log("error reading")
+    }
+  }
+  
 
 export const Payment = ({ navigation }) => {
   
@@ -82,9 +106,9 @@ export const Payment = ({ navigation }) => {
       var userData = {title: CCnumber, text: data.holder, imgUrl: cardType}
       var prevState = state.carouselItems;
       prevState.push(userData)
-      console.log(prevState)
       setState({carouselItems: prevState})
-      //saveData(state.carouselItems)
+      storeData(state.carouselItems)
+      
     }
   }, []);
 
@@ -97,26 +121,22 @@ export const Payment = ({ navigation }) => {
         </View>
     );
   }
-  const saveData = async () => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY, state.carouselItems)
-      alert('Data successfully saved')
-    } catch (e) {
-      alert('Failed to save the data to the storage')
-    }
-  }
-  const ReadData = async () => {
-    try {
-      const userState = await AsyncStorage.getItem(STORAGE_KEY)
+
   
-      if (userState !== null) {
-        setState({carouselItems: userState})
+  
+  useFocusEffect(
+    React.useCallback(() =>  {
+      console.log("focused")
+      async function updateList(){
+        const fetched_carousel_items = await getData();
+        setState({carouselItems: fetched_carousel_items})
       }
-    } catch (e) {
-      alert('Failed to fetch the data from storage')
-    }
-  }
+      updateList();
+    }, [])
+  );
+
     return (
+      
       <ScreenContainer>
           <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -137,6 +157,7 @@ export const Payment = ({ navigation }) => {
           />
           </View>
       </ScreenContainer>
+      
     );
     
 }

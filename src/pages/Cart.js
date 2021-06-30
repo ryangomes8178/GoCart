@@ -14,17 +14,15 @@ import {
 import { SwipeListView } from 'react-native-swipe-list-view';
 import InputSpinner from "react-native-input-spinner";
 import visa from '../../assets/mastercard.png';
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native'; 
 
 
 const ScreenContainer = ({ children }) => (
     <View style = {styles.container_2}>{children}</View>
 )
 
-global.totalUpdated = true;
-global.total = 0
-global.renderCount = 0;
-global.numCartItems = 0;
+var quantity_states = [];
 
 
   const getData = async (key) => {
@@ -38,52 +36,37 @@ global.numCartItems = 0;
     }
   }
 
-var benjamin = 0
+const fetchAllItems = async () => {
+  try {
+      console.log("fetchAllItems called")
+      const keys = await AsyncStorage.getAllKeys()
+      const items = await AsyncStorage.multiGet(keys)
+      var cart_listData = [];
+      var total = 0;
 
-//create your forceUpdate hook
-export const useForceUpdate = () => {
-    //console.log("forceupdate!")
-    if (true) {
-      console.log("rendering.......")
-      const [value, setValue] = useState(0); // integer state
-      benjamin++
-      return () => setValue(value => value + 1); // update the state to force render
-    } else {
-      return null
-    }
+      var element;
+      for (var i = 0; i < items.length; i++) {
+        element = items[i];
+        var itemDetails = JSON.parse(element[1])
+        cart_listData.push({
+          "key": i.toString(),
+          "barcode": element[0],
+          "text": itemDetails.name,
+          "quantity": quantity_states[i][0],
+          "price": itemDetails.price
+        })
+        total += quantity_states[i][0] * itemDetails.price; 
+      }
+      return [cart_listData, total];
+  } catch (error) {
+      console.log(error, "problemo")
+  }
 }
-
 
 export const Cart = ({ navigation }) => {
 
-    //var cart_list = ["Strawberries", "Gilette Razor", "Lemon", "Pesto Sauce", "Tomato", "Tortillas - 30 ct", "Filler item", "Filler item", "Filler item", "Filler item"]
-    var cart_list = []
-    var quantity_states = [];
     const [totalState, setTotalState] = useState(0)
-
-    const [listData, setListData] = useState(  
-      cart_list.map((_, i) => ({ key: `${i}`, text: cart_list[i] }))
-    );
-
-    function updateGlobalTotal() {
-      console.log("updateGlobalTotal total " + listData.length)
-      // var total = 0;
-      // if (global.total != 0 && listData.length != global.numCartItems) {
-      //   total += global.total
-      // }
-      console.log("updateGlobalTotal total returns a total of " + global.total)
-
-      // for (var i = 0; i < listData.length; i++) {
-      //   total += quantity_states[i][0] * listData[i].price
-      // }
-
-      global.total = Math.round(global.total*100)/100
-      setTotalState(global.total)
-    }
-
-    function updateLocalTotal(total) {
-      setTotalState(total);
-    }
+    const [listData, setListData] = useState([]);
 
     for (var i = 0; i < 20; i++) {
       var startingQuantity = 0;
@@ -94,39 +77,17 @@ export const Cart = ({ navigation }) => {
       [quantity_states[i][0], quantity_states[i][1]] = useState(1);
     }
 
-    const fetchAllItems = async () => {
-      try {
-          const keys = await AsyncStorage.getAllKeys()
-          const items = await AsyncStorage.multiGet(keys)
-          var cart_listData = [];
-          var total = 0;
-
-          var element;
-          for (var i = 0; i < items.length; i++) {
-            element = items[i];
-            var itemDetails = JSON.parse(element[1])
-            cart_listData.push({
-              "key": i.toString(),
-              "barcode": element[0],
-              "text": itemDetails.name,
-              "quantity": quantity_states[i][0],
-              "price": itemDetails.price
-            })
-            total += quantity_states[i][0] * itemDetails.price; 
-          }
-          if (global.renderCount < 5) {
-            updateGlobalTotal()
-            // console.log("illawarra - " + global.total)
-            // setTotalState(global.total)
-            global.renderCount += 1
-          }
-          setListData(cart_listData);
-      } catch (error) {
-          console.log(error, "problemo")
-      }
-    }
-
-    fetchAllItems();
+    useFocusEffect(
+      React.useCallback(() =>  {
+        console.log("focused")
+        async function updateList(){
+          const [fetched_data, total] = await fetchAllItems();
+          setListData(fetched_data);
+          setTotalState(total)
+        }
+        updateList();
+      }, [])
+    );
 
 
 
@@ -142,23 +103,13 @@ export const Cart = ({ navigation }) => {
       const prevIndex = listData.findIndex(item => item.key === rowKey);
       console.log(listData[prevIndex])
 
-      global.total -= (listData[prevIndex].price * quantity_states[prevIndex][0])
-      global.total = Math.round(global.total * 100) / 100
-      global.numCartItems -= 1
-      console.log("items in cart: " + numCartItems)
-      setTotalState(global.total)
+      console.log("old total ", totalState, "subtracting", listData[prevIndex].price * quantity_states[prevIndex][0])
+      var newTotal = totalState - (listData[prevIndex].price * quantity_states[prevIndex][0])
+      newTotal = Math.round(newTotal * 100) / 100
+      setTotalState(newTotal)
+
       AsyncStorage.removeItem(listData[prevIndex].barcode)
       newData.splice(prevIndex, 1);
-
-      for (var i = prevIndex; i < 18; i++) {
-        console.log("setting quantity " + i + " to " + quantity_states[i+1][0])
-       
-        quantity_states[i][1](quantity_states[i+1][0])
-       
-        if(i+1 < newData.length){
-          newData[i].quantity = newData[i+1].quantity;
-        }
-      }
 
       setListData(newData);
 
@@ -192,21 +143,23 @@ export const Cart = ({ navigation }) => {
                   style={{width: "80%"}}
                   colorMax={"#f04048"}
                   colorMin={"#40c5f4"}
+                  editable={false}
                   fontSize={25}
                   value={quantity_states[data.item.key][0]}
                   onChange={(num) => {
                     quantity_states[data.item.key][1](num);
+
                   }}
                   onIncrease={(increased) => {
-                    global.total += parseFloat(data.item.price)
-                    global.total = Math.round(global.total * 100) / 100
-                    setTotalState(global.total)
+                    var newTotal = totalState + parseFloat(data.item.price)
+                    newTotal = Math.round(newTotal * 100) / 100
+                    setTotalState(newTotal)
                     console.log("new total " + global.total)
                   }}
                   onDecrease={(decreased) => {
-                    global.total -= parseFloat(data.item.price)
-                    global.total = Math.round(global.total * 100) / 100
-                    setTotalState(global.total)
+                    var newTotal = totalState - parseFloat(data.item.price)
+                    newTotal = Math.round(newTotal * 100) / 100
+                    setTotalState(newTotal)
                     console.log("new total " + global.total)
                   }}
                 />
@@ -288,7 +241,7 @@ export const Cart = ({ navigation }) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
-                onPress={useForceUpdate()}>
+                onPress={() => {console.log("hi")}}>
                 <Text style={{color: 'white', fontSize: 16}}>Checkout - <Text style={{fontWeight:"bold"}}>{"$" + totalState.toFixed(2)}</Text></Text>
               </TouchableOpacity>
 

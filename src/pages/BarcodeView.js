@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Device from 'expo-device'
 
 export const BarcodeView = ({navigation}) => {
     const [hasPermission, setHasPermission] = useState(null);
@@ -80,15 +81,14 @@ export const BarcodeView = ({navigation}) => {
     const handleBarCodeScanned = ({ type, data }) => {
         setScanned(true);
         var barcode = data.toString()
-        global.itemsFetched = false;
-        console.log(global.itemsFetched)
-        if (productHashMap.has(data.toString())) {
-            global.numCartItems += 1;
-            console.log("items in cart: " + numCartItems)
-            global.total += parseFloat(productHashMap.get(barcode).price)
-            global.total = Math.round(total*100)/100
-            global.renderCount = 0;
-            console.log("global total " + global.total)
+
+
+        //hacky fix for weird scanning on iPhones
+        if (Device.brand == "Apple") {
+            barcode = barcode.substr(1)
+        }
+        
+        if (productHashMap.has(barcode)) {
             alert(`${productHashMap.get(barcode).name} has been scanned and has a price of ${productHashMap.get(barcode).price}!`);
             storeData(barcode, productHashMap.get(barcode))
             getData(barcode)

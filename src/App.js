@@ -23,7 +23,7 @@ export default function App() {
           <>
             <AuthStack.Screen name="SKRT" component={TabManager} options={{headerShown: false}}/>
             <AuthStack.Screen name="Payment" component={Payment}/>
-            <AuthStack.Screen name="Confirmation" component={Confirmation}/>
+            <AuthStack.Screen name="Confirmation" component={Confirmation} />
           </>
         ) : (
           <>

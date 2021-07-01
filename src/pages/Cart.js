@@ -16,7 +16,29 @@ import InputSpinner from "react-native-input-spinner";
 import visa from '../../assets/mastercard.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CryptoES from "crypto-es";
-import { useFocusEffect } from '@react-navigation/native'; 
+import { useFocusEffect } from '@react-navigation/native';
+import firebase from 'firebase/app'
+
+// Optionally import the services that you want to use
+import "firebase/auth";
+import "firebase/database";
+import "firebase/firestore";
+import "firebase/functions";
+import "firebase/storage";
+
+// Initialize Firebase
+const firebaseConfig = {
+    apiKey: 'AIzaSyA5CjNAoW1M_HohYvAM-ZLaXTzCOQEo06k',
+    authDomain: 'skrt-3dda3.firebaseapp.com',
+    databaseURL: 'https://skrt-3dda3.firebaseio.com',
+    projectId: 'skrt-3dda3',
+    storageBucket: 'skrt-3dda3.appspot.com',
+    messagingSenderId: '717588843701',
+    appId: 'app-id',
+};
+
+firebase.initializeApp(firebaseConfig);
+var database = firebase.database();
 
 
 const ScreenContainer = ({ children }) => (
@@ -24,7 +46,7 @@ const ScreenContainer = ({ children }) => (
 )
 
 var quantity_states = [];
-
+var global_cart;
 
 const getData = async (key) => {
   try {
@@ -58,8 +80,9 @@ const fetchAllItems = async () => {
           "quantity": quantity_states[i][0],
           "price": itemDetails.price
         })
-        total += quantity_states[i][0] * itemDetails.price; 
+        total += quantity_states[i][0] * itemDetails.price;
       }
+      global_cart = cart_listData;
       return [cart_listData, total];
   } catch (error) {
       console.log(error, "problemo")
@@ -108,7 +131,7 @@ export const Cart = ({ navigation }) => {
     );
 
   const handleCheckout = () => {
-
+      writeCartToDatabase(global_cart);
       var http_method = 'post';                // Lower case.
       var url_path = '/v1/payments';    // Portion after the base URL.
       var salt = CryptoES.lib.WordArray.random(12);  // Randomly generated for each request.
@@ -328,6 +351,11 @@ export const Cart = ({ navigation }) => {
       </ScreenContainer>
     );
   };
+
+function writeCartToDatabase(cart) {
+    var orderId = Math.random() * 10000000
+    database.ref('orders/' + orderId).set({cart: cart});
+};
   
   const styles = StyleSheet.create({
     container: {

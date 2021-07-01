@@ -30,7 +30,7 @@ import "firebase/storage";
 const firebaseConfig = {
     apiKey: 'AIzaSyA5CjNAoW1M_HohYvAM-ZLaXTzCOQEo06k',
     authDomain: 'skrt-3dda3.firebaseapp.com',
-    databaseURL: 'https://skrt-3dda3.firebaseio.com',
+    databaseURL: 'https://skrt-3dda3-default-rtdb.firebaseio.com',
     projectId: 'skrt-3dda3',
     storageBucket: 'skrt-3dda3.appspot.com',
     messagingSenderId: '717588843701',

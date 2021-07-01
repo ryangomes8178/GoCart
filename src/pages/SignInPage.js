@@ -9,7 +9,7 @@ import {
   Button,
   TouchableOpacity,
 } from "react-native";
-
+import LottieView from 'lottie-react-native';
 export var isLoggedIn = false;
 
 const ScreenContainer = ({ children }) => (
@@ -23,9 +23,17 @@ export const SignInPage = ({ navigation }) => {
   return (
     <ScreenContainer>
       <View style={styles.container}>
-        <Image style={styles.image} source={require("../../assets/log2.png")} />
- 
+        <Image style={styles.image} source={require("../../assets/goCart.png")} />
+        <View>
+        <LottieView
+        style = {styles.cartAni}
+        source = {require("../../assets/41819-shopping-cart-icon")}
+        autoPlay = {true}
+        loop = {true}
+        />
+        </View>
         <StatusBar style="auto" />
+       
         <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
@@ -67,20 +75,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
- 
+  
+  cartAni: {
+    width:300,
+    height:300,
+  },
+
   image: {
-    marginBottom: 30,
-    width: "75%",
-    height: "30%",
+    width: 200,
+    height: 100,
+    marginBottom: 0,
+    justifyContent:'flex-start'
   },
  
   inputView: {
-    backgroundColor: "#FFC0CB",
+    backgroundColor: "#ADD8E6",
     borderRadius: 30,
-    width: "70%",
+    width: 1000,
     height: 45,
-    marginBottom: 20,
     alignItems: "center",
+    marginBottom:10
   },
  
   TextInput: {
@@ -92,6 +106,7 @@ const styles = StyleSheet.create({
   forgot_button: {
     height: 30,
     marginBottom: 30,
+    paddingTop:10
   },
  
   loginBtn: {

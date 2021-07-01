@@ -384,9 +384,9 @@ export const Cart = ({ navigation }) => {
   };
 
 function writeCartToDatabase(cart) {
-    var orderId = Math.round(Math.random() * 10000000);
-    orderId = orderId.toString();
-    database.ref('orders/' + orderId).set({cart: cart});
+    global.orderid = Math.round(Math.random() * 10000000);
+    global.orderid = global.orderid.toString();
+    database.ref('orders/' + global.orderid).set({cart: cart});
 };
   
   const styles = StyleSheet.create({

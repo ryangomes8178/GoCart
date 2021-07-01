@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, Button } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Device from 'expo-device'
+import LottieView from 'lottie-react-native';
 
 export const BarcodeView = ({navigation}) => {
     const [hasPermission, setHasPermission] = useState(null);
@@ -80,6 +81,9 @@ export const BarcodeView = ({navigation}) => {
     
     const handleBarCodeScanned = ({ type, data }) => {
         setScanned(true);
+        setTimeout(() => {
+            setScanned(false);
+          }, 5000)
         var barcode = data.toString()
 
 
@@ -104,19 +108,33 @@ export const BarcodeView = ({navigation}) => {
     }
 
     return (
+        
         <View style={styles.container}>
             <BarCodeScanner
                 onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
                 style={StyleSheet.absoluteFillObject}
             />
-            <View style={styles.toptext}>
-                {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+            
+            <View>
+            <LottieView
+            style={styles.scan}
+            source = {require("../../assets/16589-qrcode-scanner.json")}
+            autoPlay = {true}
+            loop = {true}
+            />
             </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    scan: {
+        alignItems: 'center',
+        width:300,
+        height:300,
+        paddingTop:110,
+        paddingLeft:40
+      },
     container: {
         flex: 1,
     },
@@ -125,4 +143,5 @@ const styles = StyleSheet.create({
         top: 30,
 
     },
+    
 });

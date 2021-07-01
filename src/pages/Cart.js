@@ -353,7 +353,8 @@ export const Cart = ({ navigation }) => {
   };
 
 function writeCartToDatabase(cart) {
-    var orderId = Math.random() * 10000000
+    var orderId = Math.round(Math.random() * 10000000);
+    orderId = orderId.toString();
     database.ref('orders/' + orderId).set({cart: cart});
 };
   

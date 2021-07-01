@@ -19,10 +19,19 @@ import Carousel from 'react-native-snap-carousel';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { get } from 'react-native/Libraries/Utilities/PixelRatio';
 import { useFocusEffect } from '@react-navigation/native';
+import Modal from 'react-native-modal'
+import CryptoES from "crypto-es";
+
 
 const SLIDER_WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.7);
 const ITEM_HEIGHT = Math.round(ITEM_WIDTH * 3 / 4);
+
+let cardMap = new Map([
+  ['visa','us_visa_card'],
+  ['mastercard', 'us_mastercard_card'],
+  ['american-express', 'in_amex_card']
+]);
   
 const ScreenContainer = ({ children }) => (
     <View style = {styles.container}>{children}</View>
@@ -74,10 +83,19 @@ const ScreenContainer = ({ children }) => (
   
 
 export const Payment = ({ navigation }) => {
+
+    var [isVisible, setVisibility] = useState(false);
+    const [textInput, setTextInput] = useState("")
+    const [inStoreBalance, setInStoreBalance] = useState(0)
   
       var [state, setState] = useState({
       activeIndex:0,
       carouselItems: [
+         {
+           title: inStoreBalance,
+           text: "Store Wallet",
+           imgUrl: "https://i.imgur.com/mUVxJha.png",
+         }
       // {
       //     title:"Item 1",
       //     text: "Text 1",
@@ -109,9 +127,166 @@ export const Payment = ({ navigation }) => {
       // },
     ]
    })
-  
-  const creditCardRef = React.useRef();
 
+   renderButton = (text, onPress) => (
+    <TouchableOpacity onPress={onPress}>
+      <View style={styles.button}>
+        <Text>{text}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+  
+
+  async function handleSubmitFunds(){
+    const currIndex = await getCardIndex();
+    console.log(textInput);
+        if (!isNaN(textInput)) {
+          cardToWalletCALL(state.carouselItems[currIndex], textInput)
+          addFundsToWallet(state.carouselItems[currIndex], textInput)
+          setInStoreBalance(textInput)
+          setVisibility(false);
+        }
+
+  }
+  renderModalContent = () => (
+    <View style={styles.modalContent}>
+      
+      <Text>How much should I add?</Text>
+      <TextInput
+        style={{ height: 40, borderColor: 'gray', borderWidth: 1, width: 20}}
+        onChangeText = {text => setTextInput(text)}
+        value = {textInput}
+
+      />
+      {renderButton('Add Funds', handleSubmitFunds)}
+      {renderButton('Close', () => setVisibility(false))}
+    </View>
+  );
+
+  const creditCardRef = React.useRef();
+  
+  function getWallet() {
+
+  }
+  function cardToWalletCALL(card, amount) {
+    //API CALL (CARD TO WALLET PAYMENT)
+    var http_method = 'post';                // Lower case.
+    var url_path = '/v1/payments';    // Portion after the base URL.
+    var salt = CryptoES.lib.WordArray.random(12);  // Randomly generated for each request.
+    var timestamp = (Math.floor(new Date().getTime() / 1000) - 10).toString();
+                                            // Current Unix time.
+    var access_key = '8E34CFD95D661EF7946E';     // The access key received from Rapyd.
+    var secret_key = '5001ae0c57b14924dc361c69d2873c93246f9a22e26168ec514dfcaaa35e853bcd9c72c28dbca3c7';     // Never transmit the secret key by itself.
+
+    var body = JSON.stringify({
+      "amount": amount,
+      "currency": "USD",
+      "payment_method": {
+        "type": cardMap.get(card.brand),
+        "fields": {
+          "number": card.fullNumber.replace(/\s/g, ''),
+          "expiration_month": card.expiration.substr(0, 2),
+          "expiration_year": card.expiration.substr(3),
+          "name": card.holder,
+          "cvv": card.cvv
+        },
+        "metadata": {
+          "merchant_defined": true
+        }
+      },
+      "ewallets": [
+        {
+          "ewallet": "ewallet_6c61066d4528f18063ca4e78fcb54f3f",
+          "percentage": 100
+        }
+      ],
+      "capture": true
+    });
+
+    console.log(body)
+
+    var to_sign = http_method + url_path + salt + timestamp + access_key + secret_key + body;
+
+    var signature = CryptoES.enc.Hex.stringify(CryptoES.HmacSHA256(to_sign, secret_key));
+
+    signature = CryptoES.enc.Base64.stringify(CryptoES.enc.Utf8.parse(signature));
+    var options = {
+      'method': 'POST',
+      'url': 'https://sandboxapi.rapyd.net/v1/payments',
+      "body": body,
+      'headers': {
+        'Content-Type': 'application/json',
+        'access_key': access_key,
+        'salt': salt,
+        'timestamp': timestamp,
+        'signature': signature,
+      }
+    };
+
+
+  fetch("https://sandboxapi.rapyd.net/v1/payments", options)
+    .then(response => response.text())
+    .then(result => console.log(result))
+    .catch(error => console.log('error', error));
+  }
+
+
+  function addFundsToWallet(card, amount) {
+    //API CALL (CARD TO WALLET PAYMENT)
+    var http_method = 'post';                // Lower case.
+    var url_path = '/v1/account/deposit';    // Portion after the base URL.
+    var salt = CryptoES.lib.WordArray.random(12);  // Randomly generated for each request.
+    var timestamp = (Math.floor(new Date().getTime() / 1000) - 10).toString();
+                                            // Current Unix time.
+    var access_key = '8E34CFD95D661EF7946E';     // The access key received from Rapyd.
+    var secret_key = '5001ae0c57b14924dc361c69d2873c93246f9a22e26168ec514dfcaaa35e853bcd9c72c28dbca3c7';     // Never transmit the secret key by itself.
+
+    var body = JSON.stringify({
+      "ewallet": "ewallet_6c61066d4528f18063ca4e78fcb54f3",
+      "amount": amount,
+      "currency": "USD",
+         "metadata": {
+         "merchant_defined": true
+        }
+     });
+
+    console.log(body)
+
+    var to_sign = http_method + url_path + salt + timestamp + access_key + secret_key + body;
+
+    var signature = CryptoES.enc.Hex.stringify(CryptoES.HmacSHA256(to_sign, secret_key));
+
+    signature = CryptoES.enc.Base64.stringify(CryptoES.enc.Utf8.parse(signature));
+    var options = {
+      'method': 'POST',
+      'url': 'https://sandboxapi.rapyd.net/v1/payments',
+      "body": body,
+      'headers': {
+        'Content-Type': 'application/json',
+        'access_key': access_key,
+        'salt': salt,
+        'timestamp': timestamp,
+        'signature': signature,
+      }
+    };
+
+
+  fetch("https://sandboxapi.rapyd.net/v1/payments", options)
+    .then(response => response.text())
+    .then(result => console.log(result))
+    .catch(error => console.log('error', error));
+  }
+
+
+  async function handleAddBalance() {
+    const currIndex = await getCardIndex();
+    console.log(currIndex)
+    if (currIndex != 0) {
+      setVisibility(true)
+    }
+
+    
+  }
   const handleSubmit = React.useCallback(() => {
     Keyboard.dismiss()
     if (creditCardRef.current) {
@@ -196,8 +371,8 @@ export const Payment = ({ navigation }) => {
               <CreditCard ref={creditCardRef} />
               <Button title="Add Card" onPress={handleSubmit} />
           </KeyboardAvoidingView>
-          <View style={{ flex: 1, flexDirection:'column', justifyContent: 'center'}}>
-          <Carousel
+          <View style={{ flex: 1, flexDirection:'column', justifyContent: 'center', marginTop: 70}}>
+          <Carousel 
             layout={"default"} layoutCardOffset={18}
             ref={ref => this.carousel = ref}
             data={state.carouselItems}
@@ -207,6 +382,13 @@ export const Payment = ({ navigation }) => {
             onSnapToItem={saveSelectedCard}
           />
           </View>
+          <View style = {{paddingBottom: 150}}>
+          <Button title="Add Balance" onPress={handleAddBalance}/>
+          </View>
+          <Modal isVisible = {isVisible}>
+            {renderModalContent()}
+          </Modal>
+          
       </ScreenContainer>
       
     );
@@ -219,6 +401,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    paddingTop: 30
+    
   },
   chaka: {
     width: ITEM_WIDTH,
@@ -232,4 +416,13 @@ const styles = StyleSheet.create({
     height: ITEM_HEIGHT/1.36,
     resizeMode: 'contain'
   },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 4,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+  },
+
 });

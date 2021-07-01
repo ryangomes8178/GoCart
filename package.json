@@ -10,7 +10,6 @@
   "dependencies": {
     "@expo/vector-icons": "^12.0.5",
     "@react-native-async-storage/async-storage": "^1.15.5",
-    "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/masked-view": "0.1.10",
     "@react-native-firebase/app": "^12.1.0",
     "@react-navigation/bottom-tabs": "^5.11.11",
@@ -31,6 +30,7 @@
     "react-native-credit-card-form-ui": "^1.2.5",
     "react-native-gesture-handler": "~1.10.2",
     "react-native-input-spinner": "^1.7.11",
+    "react-native-modal": "^12.0.2",
     "react-native-numeric-input": "^1.9.0",
     "react-native-qrcode-svg": "^6.1.1",
     "react-native-reanimated": "~2.1.0",

@@ -17,6 +17,7 @@ import InputSpinner from "react-native-input-spinner";
 import visa_icon from '../../assets/visa.png';
 import mastercard_icon from '../../assets/mastercard.png';
 import amex_icon from '../../assets/amex.png';
+import add_card from '../../assets/addcard.png'
 
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -61,12 +62,21 @@ let cardMap = new Map([
 ]);
 
 function getIcon(cardType) {
+
+  if (cardType == null) {
+    return add_card;
+  } else {
+    cardType = cardType.brand;
+  }
+
   if (cardType == 'visa') {
     return visa_icon;
   } else if (cardType == 'american-express'){
     return amex_icon;
   } else if (cardType == 'mastercard') {
     return mastercard_icon;
+  } else if (cardType == null) {
+    return add_card;
   }
 }
 
@@ -150,8 +160,10 @@ export const Cart = ({ navigation }) => {
         async function updateList(){
           const [fetched_data, total] = await fetchAllItems();
           const currCard = await getData("@current_card")
+
           console.log(currCard);
           setCardState(currCard);
+
           setListData(fetched_data);
           setTotalState(total)
         }
@@ -160,6 +172,12 @@ export const Cart = ({ navigation }) => {
     );
 
   const handleCheckout = () => {
+
+      if (cardState == null) {
+        alert("Please add a payment method to check out!")
+        return;
+      }
+
       writeCartToDatabase(global_cart);
       var http_method = 'post';                // Lower case.
       var url_path = '/v1/payments';    // Portion after the base URL.
@@ -220,7 +238,12 @@ export const Cart = ({ navigation }) => {
       .then(result => console.log(result))
       .catch(error => console.log('error', error));
 
+    for (var i = 0; i < listData.length; i++) {
+      AsyncStorage.removeItem(listData[i].barcode)
+    }
+
     navigation.navigate("Confirmation")
+
   }
 
   const closeRow = (rowMap, rowKey) => {
@@ -362,7 +385,7 @@ export const Cart = ({ navigation }) => {
                   justifyContent: 'center'
                 }}
                 onPress={() => {navigation.navigate("Payment")}}>
-                  <Image source={getIcon(cardState.brand)} style={{ width: "40%", height: "40%"}} /> 
+                  <Image source={getIcon(cardState)} style={{ width: "40%", height: "40%"}} /> 
               </TouchableOpacity>
 
               <TouchableOpacity

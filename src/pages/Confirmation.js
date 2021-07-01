@@ -16,6 +16,7 @@ import LottieView from 'lottie-react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 // Simple usage, defaults for all but the value
+
 export const Confirmation = ({ navigation }) => {
     console.log(global.orderid)
     return (

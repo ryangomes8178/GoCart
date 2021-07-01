@@ -13,7 +13,12 @@ import {
 } from "react-native";
 import { SwipeListView } from 'react-native-swipe-list-view';
 import InputSpinner from "react-native-input-spinner";
-import visa from '../../assets/mastercard.png';
+
+import visa_icon from '../../assets/visa.png';
+import mastercard_icon from '../../assets/mastercard.png';
+import amex_icon from '../../assets/amex.png';
+
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CryptoES from "crypto-es";
 import { useFocusEffect } from '@react-navigation/native';
@@ -48,6 +53,23 @@ const ScreenContainer = ({ children }) => (
 var quantity_states = [];
 var global_cart;
 
+
+let cardMap = new Map([
+    ['visa','us_visa_card'],
+    ['mastercard', 'us_mastercard_card'],
+    ['american-express', 'in_amex_card']
+]);
+
+function getIcon(cardType) {
+  if (cardType == 'visa') {
+    return visa_icon;
+  } else if (cardType == 'american-express'){
+    return amex_icon;
+  } else if (cardType == 'mastercard') {
+    return mastercard_icon;
+  }
+}
+
 const getData = async (key) => {
   try {
     const jsonValue = await AsyncStorage.getItem(key)
@@ -69,6 +91,10 @@ const fetchAllItems = async () => {
 
       var element;
       for (var i = 0; i < items.length; i++) {
+        //check if element is a barcode
+        if (isNaN(keys[i])) {
+          continue;
+        }
         element = items[i];
         var itemDetails = JSON.parse(element[1])
         console.log(itemDetails)
@@ -107,6 +133,7 @@ export const Cart = ({ navigation }) => {
 
     const [totalState, setTotalState] = useState(0)
     const [listData, setListData] = useState([]);
+    const [cardState, setCardState] = useState({})
 
     for (var i = 0; i < 20; i++) {
       var startingQuantity = 0;
@@ -122,7 +149,9 @@ export const Cart = ({ navigation }) => {
         console.log("focused")
         async function updateList(){
           const [fetched_data, total] = await fetchAllItems();
-          
+          const currCard = await getData("@current_card")
+          console.log(currCard);
+          setCardState(currCard);
           setListData(fetched_data);
           setTotalState(total)
         }
@@ -144,13 +173,13 @@ export const Cart = ({ navigation }) => {
         "amount": totalState,
         "currency": "USD",
         "payment_method": {
-          "type": "in_amex_card",
+          "type": cardMap.get(cardState.brand),
           "fields": {
-            "number": "4111111111111111",
-            "expiration_month": "12",
-            "expiration_year": "23",
-            "name": "John Doe",
-            "cvv": "345"
+            "number": cardState.fullNumber.replace(/\s/g, ''),
+            "expiration_month": cardState.expiration.substr(0, 2),
+            "expiration_year": cardState.expiration.substr(3),
+            "name": cardState.holder,
+            "cvv": cardState.cvv
           },
           "metadata": {
             "merchant_defined": true
@@ -164,6 +193,8 @@ export const Cart = ({ navigation }) => {
         ],
         "capture": true
       });
+
+      console.log(body)
 
       var to_sign = http_method + url_path + salt + timestamp + access_key + secret_key + body;
 
@@ -331,7 +362,7 @@ export const Cart = ({ navigation }) => {
                   justifyContent: 'center'
                 }}
                 onPress={() => {navigation.navigate("Payment")}}>
-                  <Image source={visa} style={{ width: "40%", height: "40%"}} /> 
+                  <Image source={getIcon(cardState.brand)} style={{ width: "40%", height: "40%"}} /> 
               </TouchableOpacity>
 
               <TouchableOpacity

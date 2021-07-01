@@ -12,6 +12,7 @@ import {
   Platform,
   KeyboardAvoidingView,
   Dimensions,
+  Keyboard
 } from "react-native";
 import CreditCard from 'react-native-credit-card-form-ui';
 import Carousel from 'react-native-snap-carousel';
@@ -112,6 +113,7 @@ export const Payment = ({ navigation }) => {
   const creditCardRef = React.useRef();
 
   const handleSubmit = React.useCallback(() => {
+    Keyboard.dismiss()
     if (creditCardRef.current) {
       const { error, data } = creditCardRef.current.submit();
       var CCnumber = data.number.slice(data.number.length - 4);
@@ -166,8 +168,10 @@ export const Payment = ({ navigation }) => {
   
   useFocusEffect(
     React.useCallback(() =>  {
+
       console.log("focused")
       async function updateList(){
+
         const fetched_carousel_items = await getData();
         const currIndex = await getCardIndex();
         console.log("before snap: saved index ", currIndex, "current Index ", this.carousel.currentIndex)
@@ -175,6 +179,7 @@ export const Payment = ({ navigation }) => {
         setTimeout(() => this.carousel.snapToItem(currIndex, animated=false, fireCallback=false), 250)
         //this.carousel.snapToItem(currIndex, animated=false, fireCallback=true)
         console.log("after snap: saved index ", currIndex, "current Index ", this.carousel.currentIndex)
+        Keyboard.dismiss()
       }
       updateList();
     }, [])

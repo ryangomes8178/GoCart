@@ -273,6 +273,13 @@ export const Payment = ({ navigation }) => {
     .then(response => response.text())
     .then(result => console.log(result))
     .catch(error => console.log('error', error));
+
+  var clone = JSON.parse(JSON.stringify(state.carouselItems))
+  clone[0].title = (parseFloat(clone[0].title) + parseFloat(amount)).toString();
+
+
+  setState({carouselItems: clone})
+
   }
 
 
@@ -293,10 +300,8 @@ export const Payment = ({ navigation }) => {
       }    
 
       var prevState = fetched_carousel_items;
-      console.log("prev state without add ", prevState)
       prevState.push(data)
       setState({carouselItems: prevState})
-      console.log("prev State with add ", prevState)
       storeData(prevState)
       
 
@@ -334,21 +339,6 @@ export const Payment = ({ navigation }) => {
 
       pushToCarousel(userData)
 
-
-
-      // //returning as empty even though state.carouselItems should be set in useFocusEffect() (and cards are visible on the carousel)
-      // var prevState = state.carouselItems;
-      // console.log("prev state without add ", prevState)
-      // prevState.push(userData)
-      // setState({carouselItems: prevState})
-      // console.log("prev State with add ", state.carouselItems)
-      // storeData(prevState)
-      
-
-      // if(state.carouselItems.length == 1) {
-      //   saveSelectedCard(0)
-      // }
-      
     }
   }, []);
 
@@ -363,8 +353,53 @@ export const Payment = ({ navigation }) => {
   }
 
   const saveSelectedCard = (slideIndex) => {
-    console.log(state.carouselItems[slideIndex])
     storeCard(slideIndex, state.carouselItems[slideIndex])
+  }
+
+  async function updateStoreCredit(current_carousel) {
+   //API CALL (CARD TO WALLET PAYMENT)
+    var http_method = 'get';                // Lower case.
+    var url_path = '/v1/user/ewallet_6c61066d4528f18063ca4e78fcb54f3f/accounts';    // Portion after the base URL.
+    var salt = CryptoES.lib.WordArray.random(12);  // Randomly generated for each request.
+    var timestamp = (Math.floor(new Date().getTime() / 1000) - 10).toString();
+                                            // Current Unix time.
+    var access_key = '8E34CFD95D661EF7946E';     // The access key received from Rapyd.
+    var secret_key = '5001ae0c57b14924dc361c69d2873c93246f9a22e26168ec514dfcaaa35e853bcd9c72c28dbca3c7';     // Never transmit the secret key by itself.
+
+    var body = "";
+
+    var to_sign = http_method + url_path + salt + timestamp + access_key + secret_key + body;
+
+    var signature = CryptoES.enc.Hex.stringify(CryptoES.HmacSHA256(to_sign, secret_key));
+
+    signature = CryptoES.enc.Base64.stringify(CryptoES.enc.Utf8.parse(signature));
+    var options = {
+      'method': 'GET',
+      'url': 'https://sandboxapi.rapyd.net' + url_path,
+      "body": body,
+      'headers': {
+        'Content-Type': 'application/json',
+        'access_key': access_key,
+        'salt': salt,
+        'timestamp': timestamp,
+        'signature': signature,
+      }
+    };
+
+  fetch(options.url, options)
+    .then(response => response.text())
+    .then((result) => {
+
+      result = JSON.parse(result)
+
+      var clone = current_carousel
+
+      clone[0].title = result.data[0].balance.toString()
+
+      setState({carouselItems: clone})
+      storeData(clone)
+    })
+    .catch(error => console.log('error', error));    
   }
   
   useFocusEffect(
@@ -372,34 +407,15 @@ export const Payment = ({ navigation }) => {
     React.useCallback(() =>  {
 
       console.log("focused")
-        // var userData = {
-        //   title: inStoreBalance,
-        //   text: "Store Wallet",
-        //   imgUrl: "https://i.imgur.com/mUVxJha.png"
-        //   //,
-        //   // brand: data.brand,
-        //   // fullNumber: data.number,
-        //   // cvv: data.cvv,
-        //   // expiration: data.expiration,
-        //   // holder: data.holder, 
-        // }
 
-      //var prevState = state.carouselItems;
-      // prevState.push(userData)
-      // setState({carouselItems: prevState})
-      // storeData(prevState)
 
       async function updateList(){
-        // var prevState = state.carouselItems;
-        // prevState.push(userData)
-        
-        // storeData(prevState)
+ 
         var fetched_carousel_items = await getData();
+        updateStoreCredit(fetched_carousel_items);
         const currIndex = await getCardIndex();
         setState({carouselItems: fetched_carousel_items})
-        //fetched_carousel_items.unshift(userData)
-        //setState({carouselItems: fetched_carousel_items})
-        //storeData(state.carouselItems)
+        
         setTimeout(() => this.carousel.snapToItem(currIndex, animated=false, fireCallback=false), 100)
         
         Keyboard.dismiss()

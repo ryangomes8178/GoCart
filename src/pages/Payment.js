@@ -1,5 +1,5 @@
 import { setStatusBarNetworkActivityIndicatorVisible, StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -91,11 +91,8 @@ export const Payment = ({ navigation }) => {
       var [state, setState] = useState({
       activeIndex:0,
       carouselItems: [
-         {
-           title: inStoreBalance,
-           text: "Store Wallet",
-           imgUrl: "https://i.imgur.com/mUVxJha.png",
-         }
+
+         
       // {
       //     title:"Item 1",
       //     text: "Text 1",
@@ -128,6 +125,7 @@ export const Payment = ({ navigation }) => {
     ]
    })
 
+
    renderButton = (text, onPress) => (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.button}>
@@ -141,8 +139,8 @@ export const Payment = ({ navigation }) => {
     const currIndex = await getCardIndex();
     console.log(textInput);
         if (!isNaN(textInput)) {
-          cardToWalletCALL(state.carouselItems[currIndex], textInput)
-          addFundsToWallet(state.carouselItems[currIndex], textInput)
+          //cardToWalletCALL(state.carouselItems[currIndex], textInput)
+          addFundsToWallet(textInput)
           setInStoreBalance(textInput)
           setVisibility(false);
         }
@@ -212,7 +210,7 @@ export const Payment = ({ navigation }) => {
     signature = CryptoES.enc.Base64.stringify(CryptoES.enc.Utf8.parse(signature));
     var options = {
       'method': 'POST',
-      'url': 'https://sandboxapi.rapyd.net/v1/payments',
+      'url': 'https://sandboxapi.rapyd.net' + url_path,
       "body": body,
       'headers': {
         'Content-Type': 'application/json',
@@ -224,14 +222,14 @@ export const Payment = ({ navigation }) => {
     };
 
 
-  fetch("https://sandboxapi.rapyd.net/v1/payments", options)
+  fetch(options.url, options)
     .then(response => response.text())
     .then(result => console.log(result))
     .catch(error => console.log('error', error));
   }
 
 
-  function addFundsToWallet(card, amount) {
+  function addFundsToWallet(amount) {
     //API CALL (CARD TO WALLET PAYMENT)
     var http_method = 'post';                // Lower case.
     var url_path = '/v1/account/deposit';    // Portion after the base URL.
@@ -242,7 +240,7 @@ export const Payment = ({ navigation }) => {
     var secret_key = '5001ae0c57b14924dc361c69d2873c93246f9a22e26168ec514dfcaaa35e853bcd9c72c28dbca3c7';     // Never transmit the secret key by itself.
 
     var body = JSON.stringify({
-      "ewallet": "ewallet_6c61066d4528f18063ca4e78fcb54f3",
+      "ewallet": "ewallet_6c61066d4528f18063ca4e78fcb54f3f",
       "amount": amount,
       "currency": "USD",
          "metadata": {
@@ -259,7 +257,7 @@ export const Payment = ({ navigation }) => {
     signature = CryptoES.enc.Base64.stringify(CryptoES.enc.Utf8.parse(signature));
     var options = {
       'method': 'POST',
-      'url': 'https://sandboxapi.rapyd.net/v1/payments',
+      'url': 'https://sandboxapi.rapyd.net' + url_path,
       "body": body,
       'headers': {
         'Content-Type': 'application/json',
@@ -271,7 +269,7 @@ export const Payment = ({ navigation }) => {
     };
 
 
-  fetch("https://sandboxapi.rapyd.net/v1/payments", options)
+  fetch(options.url, options)
     .then(response => response.text())
     .then(result => console.log(result))
     .catch(error => console.log('error', error));
@@ -284,9 +282,29 @@ export const Payment = ({ navigation }) => {
     if (currIndex != 0) {
       setVisibility(true)
     }
-
-    
   }
+
+  async function pushToCarousel(data) {
+
+      var fetched_carousel_items = await getData();  
+
+      if (fetched_carousel_items == null) {
+        fetched_carousel_items = []
+      }    
+
+      var prevState = fetched_carousel_items;
+      console.log("prev state without add ", prevState)
+      prevState.push(data)
+      setState({carouselItems: prevState})
+      console.log("prev State with add ", prevState)
+      storeData(prevState)
+      
+
+      if(state.carouselItems.length == 1) {
+        saveSelectedCard(0)
+      }    
+  }
+
   const handleSubmit = React.useCallback(() => {
     Keyboard.dismiss()
     if (creditCardRef.current) {
@@ -310,18 +328,26 @@ export const Payment = ({ navigation }) => {
 
         brand: data.brand,
         fullNumber: data.number,
-        cvv: data.cvv,
         expiration: data.expiration,
         holder: data.holder, 
       }
-      var prevState = state.carouselItems;
-      prevState.push(userData)
-      setState({carouselItems: prevState})
-      storeData(state.carouselItems)
 
-      if(state.carouselItems.length == 1) {
-        saveSelectedCard(0)
-      }
+      pushToCarousel(userData)
+
+
+
+      // //returning as empty even though state.carouselItems should be set in useFocusEffect() (and cards are visible on the carousel)
+      // var prevState = state.carouselItems;
+      // console.log("prev state without add ", prevState)
+      // prevState.push(userData)
+      // setState({carouselItems: prevState})
+      // console.log("prev State with add ", state.carouselItems)
+      // storeData(prevState)
+      
+
+      // if(state.carouselItems.length == 1) {
+      //   saveSelectedCard(0)
+      // }
       
     }
   }, []);
@@ -342,20 +368,43 @@ export const Payment = ({ navigation }) => {
   }
   
   useFocusEffect(
+
     React.useCallback(() =>  {
 
       console.log("focused")
-      async function updateList(){
+        // var userData = {
+        //   title: inStoreBalance,
+        //   text: "Store Wallet",
+        //   imgUrl: "https://i.imgur.com/mUVxJha.png"
+        //   //,
+        //   // brand: data.brand,
+        //   // fullNumber: data.number,
+        //   // cvv: data.cvv,
+        //   // expiration: data.expiration,
+        //   // holder: data.holder, 
+        // }
 
-        const fetched_carousel_items = await getData();
+      //var prevState = state.carouselItems;
+      // prevState.push(userData)
+      // setState({carouselItems: prevState})
+      // storeData(prevState)
+
+      async function updateList(){
+        // var prevState = state.carouselItems;
+        // prevState.push(userData)
+        
+        // storeData(prevState)
+        var fetched_carousel_items = await getData();
         const currIndex = await getCardIndex();
-        console.log("before snap: saved index ", currIndex, "current Index ", this.carousel.currentIndex)
         setState({carouselItems: fetched_carousel_items})
-        setTimeout(() => this.carousel.snapToItem(currIndex, animated=false, fireCallback=false), 250)
-        //this.carousel.snapToItem(currIndex, animated=false, fireCallback=true)
-        console.log("after snap: saved index ", currIndex, "current Index ", this.carousel.currentIndex)
+        //fetched_carousel_items.unshift(userData)
+        //setState({carouselItems: fetched_carousel_items})
+        //storeData(state.carouselItems)
+        setTimeout(() => this.carousel.snapToItem(currIndex, animated=false, fireCallback=false), 100)
+        
         Keyboard.dismiss()
       }
+
       updateList();
     }, [])
   );

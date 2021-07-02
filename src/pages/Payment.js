@@ -275,7 +275,7 @@ export const Payment = ({ navigation }) => {
     .catch(error => console.log('error', error));
 
   var clone = JSON.parse(JSON.stringify(state.carouselItems))
-  clone[0].title = (parseFloat(clone[0].title) + parseFloat(amount)).toString();
+  clone[0].title = "$" + ((parseFloat(clone[0].title) + parseFloat(amount)).toFixed(2).toString());
 
 
   setState({carouselItems: clone})
@@ -305,9 +305,9 @@ export const Payment = ({ navigation }) => {
       storeData(prevState)
       
 
-      if(state.carouselItems.length == 1) {
-        saveSelectedCard(0)
-      }    
+      // if(state.carouselItems.length == 1) {
+      //   saveSelectedCard(0)
+      // }    
   }
 
   const handleSubmit = React.useCallback(() => {
@@ -353,6 +353,7 @@ export const Payment = ({ navigation }) => {
   }
 
   const saveSelectedCard = (slideIndex) => {
+    console.log("saving card index ", slideIndex)
     storeCard(slideIndex, state.carouselItems[slideIndex])
   }
 
@@ -394,7 +395,7 @@ export const Payment = ({ navigation }) => {
 
       var clone = current_carousel
 
-      clone[0].title = result.data[0].balance.toString()
+      clone[0].title = "$" + (result.data[0].balance.toFixed(2).toString())
 
       setState({carouselItems: clone})
       storeData(clone)

@@ -38,9 +38,10 @@ export const SignInPage = ({ navigation }) => {
       if (jsonValue == null){
         console.log("adding store credit card")
         var userData = {
-           title: "0",
+           title: "$0.00",
            text: "Store Wallet",
-           imgUrl: "https://i.imgur.com/KThblus.png"
+           imgUrl: "https://i.imgur.com/KThblus.png",
+           brand: "in-store"
            //,
            // brand: data.brand,
            //  fullNumber: data.number,

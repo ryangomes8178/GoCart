@@ -14,23 +14,25 @@ import {
 import { SwipeListView } from 'react-native-swipe-list-view';
 import InputSpinner from "react-native-input-spinner";
 
-import visa_icon from '../../assets/visa.png';
-import mastercard_icon from '../../assets/mastercard.png';
-import amex_icon from '../../assets/amex.png';
-import add_card from '../../assets/addcard.png'
-
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import CryptoES from "crypto-es";
-import { useFocusEffect } from '@react-navigation/native';
-import firebase from 'firebase/app'
-
 // Optionally import the services that you want to use
 import "firebase/auth";
 import "firebase/database";
 import "firebase/firestore";
 import "firebase/functions";
 import "firebase/storage";
+
+
+import visa_icon from '../../assets/visa.png';
+import mastercard_icon from '../../assets/mastercard.png';
+import amex_icon from '../../assets/amex.png';
+import rapyd_icon from '../../assets/storecredit.png'
+import add_card from '../../assets/addcard.png';
+
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import CryptoES from "crypto-es";
+import { useFocusEffect } from '@react-navigation/native';
+import firebase from 'firebase/app'
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -75,6 +77,8 @@ function getIcon(cardType) {
     return amex_icon;
   } else if (cardType == 'mastercard') {
     return mastercard_icon;
+  } else if (cardType == 'in-store') {
+    return rapyd_icon;
   } else if (cardType == null) {
     return add_card;
   }
@@ -179,64 +183,157 @@ export const Cart = ({ navigation }) => {
       }
 
       writeCartToDatabase(global_cart);
-      var http_method = 'post';                // Lower case.
-      var url_path = '/v1/payments';    // Portion after the base URL.
-      var salt = CryptoES.lib.WordArray.random(12);  // Randomly generated for each request.
-      var timestamp = (Math.floor(new Date().getTime() / 1000) - 10).toString();
-                                              // Current Unix time.
-      var access_key = '8E34CFD95D661EF7946E';     // The access key received from Rapyd.
-      var secret_key = '5001ae0c57b14924dc361c69d2873c93246f9a22e26168ec514dfcaaa35e853bcd9c72c28dbca3c7';     // Never transmit the secret key by itself.
 
-      var body = JSON.stringify({
-        "amount": totalState,
-        "currency": "USD",
-        "payment_method": {
-          "type": cardMap.get(cardState.brand),
-          "fields": {
-            "number": cardState.fullNumber.replace(/\s/g, ''),
-            "expiration_month": cardState.expiration.substr(0, 2),
-            "expiration_year": cardState.expiration.substr(3),
-            "name": cardState.holder,
-            "cvv": cardState.cvv
-          },
-          "metadata": {
-            "merchant_defined": true
+      if(cardState.brand == 'in-store') {
+          var http_method = 'post';                // Lower case.
+          var url_path = '/v1/account/transfer';    // Portion after the base URL.
+          var salt = CryptoES.lib.WordArray.random(12);  // Randomly generated for each request.
+          var timestamp = (Math.floor(new Date().getTime() / 1000) - 10).toString();
+                                                  // Current Unix time.
+          var access_key = '8E34CFD95D661EF7946E';     // The access key received from Rapyd.
+          var secret_key = '5001ae0c57b14924dc361c69d2873c93246f9a22e26168ec514dfcaaa35e853bcd9c72c28dbca3c7';     // Never transmit the secret key by itself.
+
+          var body = JSON.stringify({
+            "source_ewallet": "ewallet_6c61066d4528f18063ca4e78fcb54f3f",
+            "amount": totalState,
+            "currency": "USD",
+            "destination_ewallet": "ewallet_8bf64b61b3133ff3076877c05d3d0d68",
+            "metadata":
+               {
+                "merchant_defined": true
+               }
+          });
+
+          console.log(body)
+
+          var to_sign = http_method + url_path + salt + timestamp + access_key + secret_key + body;
+
+          var signature = CryptoES.enc.Hex.stringify(CryptoES.HmacSHA256(to_sign, secret_key));
+
+          signature = CryptoES.enc.Base64.stringify(CryptoES.enc.Utf8.parse(signature));
+          var options = {
+            'method': 'POST',
+            'url': 'https://sandboxapi.rapyd.net' + url_path,
+            "body": body,
+            'headers': {
+              'Content-Type': 'application/json',
+              'access_key': access_key,
+              'salt': salt,
+              'timestamp': timestamp,
+              'signature': signature,
+            }
           }
-        },
-        "ewallets": [
-          {
-            "ewallet": "ewallet_8bf64b61b3133ff3076877c05d3d0d68",
-            "percentage": 100
-          }
-        ],
-        "capture": true
-      });
 
-      console.log(body)
+        fetch("https://sandboxapi.rapyd.net" + url_path, options)
+          .then(response => response.text())
+          .then((result) => {
+            result = JSON.parse(result)
+            if (result.data.status == 'PEN') {
+              //accept the transaction
 
-      var to_sign = http_method + url_path + salt + timestamp + access_key + secret_key + body;
+              var http_method = 'post';                // Lower case.
+              var url_path = '/v1/account/transfer/response';    // Portion after the base URL.
+              var salt = CryptoES.lib.WordArray.random(12);  // Randomly generated for each request.
+              var timestamp = (Math.floor(new Date().getTime() / 1000) - 10).toString();
+                                                      // Current Unix time.
+              var access_key = '8E34CFD95D661EF7946E';     // The access key received from Rapyd.
+              var secret_key = '5001ae0c57b14924dc361c69d2873c93246f9a22e26168ec514dfcaaa35e853bcd9c72c28dbca3c7';     // Never transmit the secret key by itself.
 
-      var signature = CryptoES.enc.Hex.stringify(CryptoES.HmacSHA256(to_sign, secret_key));
+              var body = JSON.stringify({
+                "id": result.data.id,
+                  "metadata": {
+                      "merchant_defined": "accepted"
+                  },
+                "status": "accept"
+              });
 
-      signature = CryptoES.enc.Base64.stringify(CryptoES.enc.Utf8.parse(signature));
-      var options = {
-        'method': 'POST',
-        'url': 'https://sandboxapi.rapyd.net/v1/payments',
-        "body": body,
-        'headers': {
-          'Content-Type': 'application/json',
-          'access_key': access_key,
-          'salt': salt,
-          'timestamp': timestamp,
-          'signature': signature,
-        }
-      };
+              console.log(body)
+              var to_sign = http_method + url_path + salt + timestamp + access_key + secret_key + body;
+              var signature = CryptoES.enc.Hex.stringify(CryptoES.HmacSHA256(to_sign, secret_key));
+              signature = CryptoES.enc.Base64.stringify(CryptoES.enc.Utf8.parse(signature));
+              var options = {
+                'method': 'POST',
+                'url': 'https://sandboxapi.rapyd.net' + url_path,
+                "body": body,
+                'headers': {
+                  'Content-Type': 'application/json',
+                  'access_key': access_key,
+                  'salt': salt,
+                  'timestamp': timestamp,
+                  'signature': signature,
+                }
+              };
 
 
-    fetch("https://sandboxapi.rapyd.net/v1/payments", options)
-      .then(response => response.text())
-      .then(result => console.log(result))
-      .catch(error => console.log('error', error));
+            fetch(options.url, options)
+              .then(response => response.text())
+              .then(result => console.log(result))
+              .catch(error => console.log('error', error));
+
+            }
+          })
+          .catch(error => console.log('error', error));
+      } else {
+
+          var http_method = 'post';                // Lower case.
+          var url_path = '/v1/payments';    // Portion after the base URL.
+          var salt = CryptoES.lib.WordArray.random(12);  // Randomly generated for each request.
+          var timestamp = (Math.floor(new Date().getTime() / 1000) - 10).toString();
+                                                  // Current Unix time.
+          var access_key = '8E34CFD95D661EF7946E';     // The access key received from Rapyd.
+          var secret_key = '5001ae0c57b14924dc361c69d2873c93246f9a22e26168ec514dfcaaa35e853bcd9c72c28dbca3c7';     // Never transmit the secret key by itself.
+
+          var body = JSON.stringify({
+            "amount": totalState,
+            "currency": "USD",
+            "payment_method": {
+              "type": cardMap.get(cardState.brand),
+              "fields": {
+                "number": cardState.fullNumber.replace(/\s/g, ''),
+                "expiration_month": cardState.expiration.substr(0, 2),
+                "expiration_year": cardState.expiration.substr(3),
+                "name": cardState.holder,
+                "cvv": cardState.cvv
+              },
+              "metadata": {
+                "merchant_defined": true
+              }
+            },
+            "ewallets": [
+              {
+                "ewallet": "ewallet_8bf64b61b3133ff3076877c05d3d0d68",
+                "percentage": 100
+              }
+            ],
+            "capture": true
+          });
+
+          console.log(body)
+
+          var to_sign = http_method + url_path + salt + timestamp + access_key + secret_key + body;
+
+          var signature = CryptoES.enc.Hex.stringify(CryptoES.HmacSHA256(to_sign, secret_key));
+
+          signature = CryptoES.enc.Base64.stringify(CryptoES.enc.Utf8.parse(signature));
+          var options = {
+            'method': 'POST',
+            'url': 'https://sandboxapi.rapyd.net/v1/payments',
+            "body": body,
+            'headers': {
+              'Content-Type': 'application/json',
+              'access_key': access_key,
+              'salt': salt,
+              'timestamp': timestamp,
+              'signature': signature,
+            }
+          };
+
+
+        fetch("https://sandboxapi.rapyd.net/v1/payments", options)
+          .then(response => response.text())
+          .then(result => console.log(result))
+          .catch(error => console.log('error', error));
+      }
 
     for (var i = 0; i < listData.length; i++) {
       AsyncStorage.removeItem(listData[i].barcode)

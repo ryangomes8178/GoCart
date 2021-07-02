@@ -87,6 +87,7 @@ export const Payment = ({ navigation }) => {
     var [isVisible, setVisibility] = useState(false);
     const [textInput, setTextInput] = useState("")
     const [inStoreBalance, setInStoreBalance] = useState(0)
+    var [addBalanceVisible, setAddBalanceVisible] = useState(false)
   
       var [state, setState] = useState({
       activeIndex:0,
@@ -275,7 +276,7 @@ export const Payment = ({ navigation }) => {
     .catch(error => console.log('error', error));
 
   var clone = JSON.parse(JSON.stringify(state.carouselItems))
-  clone[0].title = "$" + ((parseFloat(clone[0].title) + parseFloat(amount)).toFixed(2).toString());
+  clone[0].title = "$" + ((parseFloat(clone[0].title.substr(1)) + parseFloat(amount)).toFixed(2).toString());
 
 
   setState({carouselItems: clone})
@@ -314,6 +315,12 @@ export const Payment = ({ navigation }) => {
     Keyboard.dismiss()
     if (creditCardRef.current) {
       const { error, data } = creditCardRef.current.submit();
+
+      if (data.number.length < 19 || data.cvv.length < 3 || data.expiration.length < 7 || data.holder.length < 1) {
+        alert('Credit card information is incomplete - please try again!')
+        return;
+      }
+
       var CCnumber = data.number.slice(data.number.length - 4);
       var cardType = ""
       if (data.brand == "visa") {
@@ -354,6 +361,7 @@ export const Payment = ({ navigation }) => {
 
   const saveSelectedCard = (slideIndex) => {
     console.log("saving card index ", slideIndex)
+    setAddBalanceVisible(slideIndex != 0)
     storeCard(slideIndex, state.carouselItems[slideIndex])
   }
 
@@ -416,7 +424,7 @@ export const Payment = ({ navigation }) => {
         updateStoreCredit(fetched_carousel_items);
         const currIndex = await getCardIndex();
         setState({carouselItems: fetched_carousel_items})
-        
+        setAddBalanceVisible(currIndex != 0)
         setTimeout(() => this.carousel.snapToItem(currIndex, animated=false, fireCallback=false), 100)
         
         Keyboard.dismiss()
@@ -449,9 +457,18 @@ export const Payment = ({ navigation }) => {
           />
           </View>
           <View style = {{paddingBottom: 150}}>
-          <Button title="Add Balance" onPress={handleAddBalance}/>
+          { addBalanceVisible &&
+            <Button 
+              title="Add Balance" 
+              onPress={handleAddBalance}
+            />
+          }
           </View>
-          <Modal isVisible = {isVisible}>
+          <Modal 
+            isVisible = {isVisible}
+            animationIn={'slideInLeft'}
+            animationOut={'slideOutRight'}
+          >
             {renderModalContent()}
           </Modal>
           
@@ -490,5 +507,14 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderColor: 'rgba(0, 0, 0, 0.1)',
   },
+  button: {
+    backgroundColor: 'lightblue',
+    padding: 12,
+    margin: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 4,
+    borderColor: 'rgba(0, 0, 0, 0.1)'
+  }
 
 });

@@ -180,6 +180,9 @@ export const Cart = ({ navigation }) => {
       if (cardState == null) {
         alert("Please add a payment method to check out!")
         return;
+      } else if (totalState == 0) {
+        alert("Add some items to your cart to check out!")
+        return;
       }
 
       writeCartToDatabase(global_cart);

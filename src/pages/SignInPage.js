@@ -8,6 +8,7 @@ import {
   TextInput,
   Button,
   TouchableOpacity,
+  KeyboardAvoidingView
 } from "react-native";
 import LottieView from 'lottie-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,6 +33,17 @@ export const SignInPage = ({ navigation }) => {
     }
   }
 
+  const storeCard = async (index, value) => {
+    try {
+      const jsonValue = JSON.stringify(value)
+      await AsyncStorage.setItem('@current_card', jsonValue)
+      await AsyncStorage.setItem('@current_card_index', index.toString())
+    } catch (e) {
+      // saving error
+      console.log("saving error")
+    }
+  }
+
   const initializeStoreCredit = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('@card_key')
@@ -49,6 +61,7 @@ export const SignInPage = ({ navigation }) => {
            // expiration: data.expiration,
            // holder: data.holder, 
          }
+         storeCard(0, userData)
         const jsonValue = JSON.stringify([userData])
         await AsyncStorage.setItem('@card_key', jsonValue)
         console.log("added")
@@ -66,6 +79,10 @@ export const SignInPage = ({ navigation }) => {
  
   return (
     <ScreenContainer>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
       <View style={styles.container}>
         <Image style={styles.image} source={require("../../assets/goCart.png")} />
         <View>
@@ -104,6 +121,7 @@ export const SignInPage = ({ navigation }) => {
         <Button title="Login" onPress={() => {navigation.navigate("SKRT"); isLoggedin = true;}}/>
       
       </View>
+      </KeyboardAvoidingView>
     </ScreenContainer>
   );
 }

@@ -21,9 +21,9 @@ export const Confirmation = ({ navigation }) => {
     console.log(global.orderid)
     return (
       <View style={styles.container}>
-      <LottieView
+        <LottieView
       style = {styles.check}
-      source = {require("../../assets/64248-checkmark.json")}
+      source = {require("../../assets/5785-checkmark.json")}
       autoPlay = {true}
       loop = {false}
       />
@@ -33,6 +33,12 @@ export const Confirmation = ({ navigation }) => {
       <QRCode
         value = {global.orderid}
         size={200}
+      />
+      <LottieView
+        style = {styles.scanAni}
+        source = {require("../../assets/62699-qr-code-scanner.json")}
+        autoPlay = {true}
+        loop = {true}
       />
       </View>
     ); 
@@ -46,9 +52,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   success: {
-    fontSize : 20,
+    fontSize : 18,
     fontWeight: "bold",
-    paddingBottom: 10,
+    paddingBottom: 15,
     backgroundColor: '#fff',
     alignItems: 'center',
   },
@@ -60,13 +66,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confnumber: {
-    paddingTop: 10,
-    paddingBottom: 80,
+    paddingTop: 3,
+    paddingBottom: 15,
     backgroundColor: '#fff',
     alignItems: 'center',
   },
   check: {
+    width:200,
+    height:200,
+    justifyContent: 'center',
+  },
+  scanAni: {
     width:300,
     height:300,
+    paddingLeft:5
   },
 });

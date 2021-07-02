@@ -10,59 +10,15 @@ import {
   TouchableOpacity,
 } from "react-native";
 import LottieView from 'lottie-react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
-
 export var isLoggedIn = false;
 
 const ScreenContainer = ({ children }) => (
   <View style = {styles.container}>{children}</View>
 )
- 
 
 export const SignInPage = ({ navigation }) => {
-
-  const getData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('@card_key')
-      return jsonValue != null ? JSON.parse(jsonValue) : null;
-    } catch(e) {
-      // error reading value
-      console.log("error reading")
-    }
-  }
-
-  const initializeStoreCredit = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('@card_key')
-      if (jsonValue == null){
-        console.log("adding store credit card")
-        var userData = {
-           title: "$0.00",
-           text: "Store Wallet",
-           imgUrl: "https://i.imgur.com/KThblus.png",
-           brand: "in-store"
-           //,
-           // brand: data.brand,
-           //  fullNumber: data.number,
-           // cvv: data.cvv,
-           // expiration: data.expiration,
-           // holder: data.holder, 
-         }
-        const jsonValue = JSON.stringify([userData])
-        await AsyncStorage.setItem('@card_key', jsonValue)
-        console.log("added")
-      }
-    } catch (e) {
-        // saving error
-        console.log(e)
-      }
-  }
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  useFocusEffect(React.useCallback(() => {initializeStoreCredit()}))
  
   return (
     <ScreenContainer>

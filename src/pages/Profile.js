@@ -14,14 +14,21 @@ import {
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { isLoggedIn } from './SignInPage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LottieView from 'lottie-react-native';
 
 export const Profile = ({ navigation }) => {
   return (
     <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerContent}>
-              <Image source={{uri: 'https://i.imgur.com/ZPieMHS.png'}}
-                style={{width: 270, height: 180}} />
+              <Image source={{uri: 'https://i.imgur.com/OvlkBz3.png'}}
+                style={{width: 500, height: 100}} />
+              <LottieView
+                style = {styles.f1car}
+                source = {require("../../assets/36204-3d-ferrari-f1.json")}
+                autoPlay = {true}
+                loop = {true}
+                />
               <Text style={styles.name}>Welcome, SKRT!</Text>
               <Text style={styles.userInfo}>skrt@gmail.com </Text>
               <Text style={styles.userInfo}>Berkeley, California </Text>
@@ -32,28 +39,28 @@ export const Profile = ({ navigation }) => {
           <View style={styles.item}>
            
             <View style={styles.infoContent}>
-              <Button color="#ffffff" title="Edit my Personal Info" onPress={() => {console.log("to-do")}}/>
+              <Button color="#000000" title="Edit my Personal Info" onPress={() => {console.log("to-do")}}/>
             </View>
           </View>
 
           <View style={styles.item}>
             
             <View style={styles.infoContent}>
-              <Button color="#ffffff" title="Payment Methods" onPress={() => {navigation.navigate("Payment")}}/>
+              <Button color="#000000" title="Payment Methods" onPress={() => {navigation.navigate("Payment")}}/>
             </View>
           </View>
 
           <View style={styles.item}>
             
             <View style={styles.infoContent}>
-              <Button color="#ffffff" title="Previous Orders" onPress={() => {console.log("to-do")}}/>
+              <Button color="#000000" title="Previous Orders" onPress={() => {console.log("to-do")}}/>
             </View>
           </View>
 
           <View style={styles.item}>
             
             <View style={styles.infoContent}>
-              <Button color="#ffffff" title="Sign Out" onPress={() => {navigation.navigate("SignIn"); AsyncStorage.clear();}}/>
+              <Button color="#000000" title="Sign Out" onPress={() => {navigation.navigate("SignIn"); AsyncStorage.clear();}}/>
             </View>
           </View>
 
@@ -67,8 +74,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#DCDCDC",
   },
   headerContent:{
-    padding:80,
+    padding:40,
     alignItems: 'center',
+  },
+  f1car: {
+    width:200,
+    height:200,
   },
   avatar: {
     width: 130,
@@ -91,7 +102,7 @@ const styles = StyleSheet.create({
   },
   body:{
     padding:20,
-    backgroundColor: "#778899",
+    backgroundColor: "#ADD8E6",
     height:500,
     alignItems:'center',
   },
@@ -101,7 +112,7 @@ const styles = StyleSheet.create({
   infoContent:{
     flex:1,
     alignItems:'center',
-    padding:15
+    padding:9
   },
   iconContent:{
     flex:1,

@@ -151,12 +151,27 @@ export const Payment = ({ navigation }) => {
     <View style={styles.modalContent}>
       
       <Text>How much should I add?</Text>
+      <View style={{flexDirection: "row"}}>
       <TextInput
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1, width: 20}}
+        textAlign={"center"}
+        style={
+          { 
+            flex: 0.8,
+            height: 100, 
+            borderColor: '#ADD8E6',
+            borderWidth: 1, 
+            width: 100,
+            marginTop: 50,
+            marginBottom: 50,
+            backgroundColor: "#ADD8E6",
+            borderRadius: 30, 
+            fontSize: 50
+          }
+        }
         onChangeText = {text => setTextInput(text)}
         value = {textInput}
-
       />
+      </View>
       {renderButton('Add Funds', handleSubmitFunds)}
       {renderButton('Close', () => setVisibility(false))}
     </View>
@@ -510,7 +525,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: 'lightblue',
     padding: 12,
-    margin: 16,
+    margin: 5,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 4,

@@ -21,18 +21,19 @@ export const Confirmation = ({ navigation }) => {
     console.log(global.orderid)
     return (
       <View style={styles.container}>
-      <LottieView
-      style = {styles.check}
-      source = {require("../../assets/64248-checkmark.json")}
-      autoPlay = {true}
-      loop = {false}
-      />
+
       <Text style={styles.success}>Your order was placed successfully!</Text>
       <Text style={styles.confnumber}>Order Number - {global.orderid}</Text>
       <Text style={styles.msg}>Show this code on your way out!</Text>
       <QRCode
         value = {global.orderid}
-        size={200}
+        size={250}
+      />
+      <LottieView
+        style = {styles.scanAni}
+        source = {require("../../assets/62699-qr-code-scanner.json")}
+        autoPlay = {true}
+        loop = {false}
       />
       </View>
     ); 
@@ -46,9 +47,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   success: {
-    fontSize : 20,
+    fontSize : 18,
     fontWeight: "bold",
-    paddingBottom: 10,
+    paddingBottom: 15,
     backgroundColor: '#fff',
     alignItems: 'center',
   },
@@ -60,13 +61,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confnumber: {
-    paddingTop: 10,
-    paddingBottom: 80,
+    paddingTop: 3,
+    paddingBottom: 15,
     backgroundColor: '#fff',
     alignItems: 'center',
   },
   check: {
-    width:300,
-    height:300,
+    width:200,
+    height:200,
+    justifyContent: 'center',
   },
+  scanAni: {
+    width: 300,
+    height: 300,
+    paddingLeft: 5,
+    justifyContent: 'flex-end'
+  }
 });

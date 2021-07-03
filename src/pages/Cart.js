@@ -109,9 +109,10 @@ const fetchAllItems = async () => {
         if (isNaN(keys[i])) {
           continue;
         }
+        console.log ("items: ", items[i])
         element = items[i];
         var itemDetails = JSON.parse(element[1])
-        console.log(itemDetails)
+
         quantity_states[i][1](itemDetails.quantity)
         cart_listData.push({
           "key": i.toString(),
@@ -160,12 +161,10 @@ export const Cart = ({ navigation }) => {
 
     useFocusEffect(
       React.useCallback(() =>  {
-        console.log("focused")
         async function updateList(){
           const [fetched_data, total] = await fetchAllItems();
           const currCard = await getData("@current_card")
 
-          console.log(currCard);
           setCardState(currCard);
 
           setListData(fetched_data);
@@ -174,6 +173,17 @@ export const Cart = ({ navigation }) => {
         updateList();
       }, [])
     );
+
+  async function writeCartToDatabase(order_id) {
+    var [fetched_data, total] = await fetchAllItems();
+    console.log("write cart to database - ", fetched_data)
+    database.ref('orders/' + order_id).set({cart: fetched_data});
+    
+    for (var i = 0; i < listData.length; i++) {
+      AsyncStorage.removeItem(listData[i].barcode)
+    }
+
+  };
 
   const handleCheckout = () => {
 
@@ -185,7 +195,10 @@ export const Cart = ({ navigation }) => {
         return;
       }
 
-      writeCartToDatabase(global_cart);
+      global.orderid = Math.round(Math.random() * 10000000);
+      global.orderid = global.orderid.toString();
+
+      writeCartToDatabase(global.orderid);
 
       if(cardState.brand == 'in-store') {
           var http_method = 'post';                // Lower case.
@@ -206,8 +219,6 @@ export const Cart = ({ navigation }) => {
                 "merchant_defined": true
                }
           });
-
-          console.log(body)
 
           var to_sign = http_method + url_path + salt + timestamp + access_key + secret_key + body;
 
@@ -250,7 +261,6 @@ export const Cart = ({ navigation }) => {
                 "status": "accept"
               });
 
-              console.log(body)
               var to_sign = http_method + url_path + salt + timestamp + access_key + secret_key + body;
               var signature = CryptoES.enc.Hex.stringify(CryptoES.HmacSHA256(to_sign, secret_key));
               signature = CryptoES.enc.Base64.stringify(CryptoES.enc.Utf8.parse(signature));
@@ -311,8 +321,6 @@ export const Cart = ({ navigation }) => {
             "capture": true
           });
 
-          console.log(body)
-
           var to_sign = http_method + url_path + salt + timestamp + access_key + secret_key + body;
 
           var signature = CryptoES.enc.Hex.stringify(CryptoES.HmacSHA256(to_sign, secret_key));
@@ -338,10 +346,6 @@ export const Cart = ({ navigation }) => {
           .catch(error => console.log('error', error));
       }
 
-    for (var i = 0; i < listData.length; i++) {
-      AsyncStorage.removeItem(listData[i].barcode)
-    }
-
     navigation.navigate("Confirmation")
 
   }
@@ -356,9 +360,7 @@ export const Cart = ({ navigation }) => {
       closeRow(rowMap, rowKey);
       const newData = [...listData];
       const prevIndex = listData.findIndex(item => item.key === rowKey);
-      console.log(listData[prevIndex])
 
-      console.log("old total ", totalState, "subtracting", listData[prevIndex].price * quantity_states[prevIndex][0])
       var newTotal = totalState - (listData[prevIndex].price * quantity_states[prevIndex][0])
       newTotal = Math.round(newTotal * 100) / 100
       setTotalState(newTotal)
@@ -409,13 +411,11 @@ export const Cart = ({ navigation }) => {
                     var newTotal = totalState + parseFloat(data.item.price)
                     newTotal = Math.round(newTotal * 100) / 100
                     setTotalState(newTotal)
-                    console.log("new total " + newTotal)
                   }}
                   onDecrease={(decreased) => {
                     var newTotal = totalState - parseFloat(data.item.price)
                     newTotal = Math.round(newTotal * 100) / 100
                     setTotalState(newTotal)
-                    console.log("new total " + newTotal)
                   }}
                 />
               </View>
@@ -506,11 +506,6 @@ export const Cart = ({ navigation }) => {
     );
   };
 
-function writeCartToDatabase(cart) {
-    global.orderid = Math.round(Math.random() * 10000000);
-    global.orderid = global.orderid.toString();
-    database.ref('orders/' + global.orderid).set({cart: cart});
-};
   
   const styles = StyleSheet.create({
     container: {

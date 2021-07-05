@@ -331,7 +331,7 @@ export const Payment = ({ navigation }) => {
     if (creditCardRef.current) {
       const { error, data } = creditCardRef.current.submit();
 
-      if (data.number.length < 19 || data.cvv.length < 3 || data.expiration.length < 7 || data.holder.length < 1) {
+      if (data.number.length < 19 || data.cvv.length < 3 || data.expiration.length < 5 || data.holder.length < 1) {
         alert('Credit card information is incomplete - please try again!')
         return;
       }

@@ -29,8 +29,8 @@ export const Profile = ({ navigation }) => {
                 autoPlay = {true}
                 loop = {true}
                 />
-              <Text style={styles.name}>Welcome, SKRT!</Text>
-              <Text style={styles.userInfo}>skrt@gmail.com </Text>
+              <Text style={styles.name}>Welcome, Ron!</Text>
+              <Text style={styles.userInfo}>ron.doe@gmail.com </Text>
               <Text style={styles.userInfo}>Berkeley, California </Text>
           </View>
         </View>
@@ -60,7 +60,11 @@ export const Profile = ({ navigation }) => {
           <View style={styles.item}>
             
             <View style={styles.infoContent}>
-              <Button color="#000000" title="Sign Out" onPress={() => {navigation.navigate("SignIn"); AsyncStorage.clear();}}/>
+              <Button color="#000000" title="Sign Out" onPress={() => {
+                
+                navigation.navigate("SignIn"); 
+                AsyncStorage.clear();
+              }}/>
             </View>
           </View>
 

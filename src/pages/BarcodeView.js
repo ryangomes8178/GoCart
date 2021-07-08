@@ -52,6 +52,54 @@ export const BarcodeView = ({navigation}) => {
         ['073854008089', {
             "name": "Bicycle Standard Playing Cards - 2pk",
             "price": "7.99"
+        }],
+        ['014100075226', {
+            "name": "Pepperidge Farm - White Chocolate Macadamia",
+            "price": "4.49"
+        }], 
+        ['014100074380', {
+            "name": "Pepperidge Farm - Zurich Sugar Cookies",
+            "price": "5.49"
+        }],
+        ['030000316849', {
+            "name": "Quaker Instant Oatmeal, Flavor Variety",
+            "price": "2.99"
+        }],
+        ['016000124998', {
+            "name": "Lucky Charms - Galactic Edition",
+            "price": "5.49"
+        }],
+        ['079893116488', {
+            "name": "Organic Fruit Twists - Strawberry/Banana",
+            "price": "4.49"
+        }],
+        ['089036442800', {
+            "name": "Torani Vanilla Syrup",
+            "price": "6.49"
+        }],
+        ['762111206022', {
+            "name": "Starbucks Dark Espresso Roast",
+            "price": "5.49"
+        }],
+        ['021130470174', {
+            "name": "Signature Select Pitted Olives",
+            "price": "2.99"
+        }],
+        ['079893407982', {
+            "name": "Organic Mango Habenero Hot Sauce",
+            "price": "6.49"
+        }],
+        ['01346604', {
+            "name": "Heinz Tomato Ketchup",
+            "price": "3.49"
+        }],
+        ['307660746102', {
+            "name": "Tums Assorted Fruit",
+            "price": "5.99"
+        }],
+        ['044000032029', {
+            "name": "Oreo Chocolate Sandwich Cookies", 
+            "price": '5.99'
         }]
     ])
 
@@ -129,14 +177,17 @@ export const BarcodeView = ({navigation}) => {
 
 const styles = StyleSheet.create({
     scan: {
-        alignItems: 'center',
+        // width:300,
+        // height:300,
+        // paddingTop:110,
+        // paddingLeft:40
         width:300,
-        height:300,
-        paddingTop:110,
-        paddingLeft:40
+        height:300
       },
     container: {
         flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     toptext: {
         alignItems: "center",

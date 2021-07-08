@@ -118,7 +118,18 @@ export const SignInPage = ({ navigation }) => {
           <Text style={styles.forgot_button}>Forgot Password?</Text>
         </TouchableOpacity>
  
-        <Button title="Login" onPress={() => {navigation.navigate("SKRT"); isLoggedin = true;}}/>
+        <Button title="Login" onPress={() => {
+          if (email == "ron.doe@gmail.com" && password == "test") {
+            setEmail("")
+            setPassword("")
+            navigation.navigate('SKRT');
+            isLoggedin = true;
+          } else {
+            setEmail("")
+            setPassword("")
+            alert("Oops! Incorrect email and/or password. Please try again!")
+          }
+        }}/>
       
       </View>
       </KeyboardAvoidingView>
@@ -161,6 +172,7 @@ const styles = StyleSheet.create({
  
   TextInput: {
     height: 50,
+    width: 300,
     flex: 1,
     alignItems: "center",
   },
